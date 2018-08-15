@@ -7,6 +7,14 @@ import java.lang.reflect.Method;
 
 public class Reflect {
 
+    /**
+     * Gets {@code Method} using reflection. The method name is created with "get" plus name of the input
+     * parameter {@code field}
+     * @param clazz Class instance that contains input {@code field}
+     * @param field if the field is from another class method will throw an PersistException
+     * @return {@code Method}
+     * @throws PersistException
+     */
     public static Method getGetterMethodByField(Class<?> clazz, Field field) throws PersistException {
 
         StringBuilder str = new StringBuilder(field.getName());
@@ -23,7 +31,7 @@ public class Reflect {
 
     public static Field getFieldByName(Class<?> clazz, String fieldName) throws PersistException {
 
-        Field field = null;
+        Field field;
 
         try {
             field = clazz.getDeclaredField(fieldName);
@@ -34,6 +42,14 @@ public class Reflect {
         return field;
     }
 
+    /**
+     * Gets {@code Method} using reflection. The method name is created with "set" plus name of the input
+     * parameter {@code field}
+     * @param clazz Class instance that contains input {@code field}
+     * @param field if the field is from another class method will throw an PersistException
+     * @return {@code Method}
+     * @throws PersistException
+     */
     public static Method getSetterMethodByField(Class<?> clazz, Field field) throws PersistException {
 
         StringBuilder str = new StringBuilder(field.getName());

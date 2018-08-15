@@ -54,8 +54,8 @@
                             <span class="glyphicon glyphicon-globe"></span> <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="<c:url value="/set_locale?loc=en_En"/>">Eng</a></li>
-                            <li><a href="<c:url value="/set_locale?loc=ru_Ru"/>">Rus</a></li>
+                            <li><a href="<c:url value="/set_locale?lang=en"/>">Eng</a></li>
+                            <li><a href="<c:url value="/set_locale?lang=ru"/>">Rus</a></li>
                         </ul>
                     </li>
                 </ul>

@@ -9,15 +9,15 @@ import myPersistenceSystem.PersistException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import service.AbstractService;
-import service.dto.reception.ShowReceptionInDto;
-import service.dto.reception.ShowReceptionOutDto;
+import service.dto.reception.ShowReception.ShowReceptionInDto;
+import service.dto.reception.ShowReception.ShowReceptionOutDto;
+import util.properties.DateTimePatternsPropertiesReader;
 
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -26,13 +26,15 @@ public class ReceptionService extends AbstractService {
 
     private final Logger logger = LogManager.getLogger(ReceptionService.class);
 
+    private Locale locale;
+
     public ReceptionService(ServletContext context, DataSource dataSource) {
         super(context, dataSource);
     }
 
-    private Map<Master, Map<Date, Boolean>> getMastersSchedule(LocalDate date, Service service){
+    private Map<Master, Map<String, Boolean>> getMastersSchedule(LocalDate date, Service service){
 
-        Map<Master, Map<Date, Boolean>> schedule = new TreeMap<>();
+        Map<Master, Map<String, Boolean>> schedule = new TreeMap<>();
 
         try (Connection connection = getDataSource().getConnection()){
 
@@ -49,7 +51,6 @@ public class ReceptionService extends AbstractService {
                         .getMasterListByService(service, connection).forEach(m -> schedule.put(m, getDailyScheme(m, date)));
             }
 
-
         }catch (SQLException e){
             throw new PersistException(e);
         }
@@ -58,11 +59,14 @@ public class ReceptionService extends AbstractService {
 
     }
 
-    private Map<Date, Boolean> getDailyScheme(Master master, LocalDate date){
+    private Map<String, Boolean> getDailyScheme(Master master, LocalDate date){
 
-        Map<Date, Boolean> schedule = new TreeMap<>();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(
+                DateTimePatternsPropertiesReader.getInstance().getPropertyValue("time_pattern"));
+
+        Map<String, Boolean> schedule = new LinkedHashMap<>();
         for (int i = 0; i < 9; i++) {
-            schedule.put(java.sql.Timestamp.valueOf(LocalDateTime.of(date, LocalTime.of(9+i,0))), false);
+            schedule.put(fmt.format(LocalTime.of(9+i,0)), false);
         }
 
         return schedule;
@@ -110,7 +114,8 @@ public class ReceptionService extends AbstractService {
 
         ShowReceptionOutDto.ShowReceptionOutDtoBuilder builder = ShowReceptionOutDto.getBuilder();
 
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(
+                DateTimePatternsPropertiesReader.getInstance().getPropertyValue("date_pattern"));
 
         LocalDate day = LocalDate.now();
         if (inDto.getDay().isPresent()){
@@ -118,7 +123,6 @@ public class ReceptionService extends AbstractService {
                 day =  LocalDate.parse(inDto.getDay().get(), dateFormat);
             }catch (Exception e){
                 logger.error("Incorrect day format in ShowReceptionCommand", e);
-
                 return builder.buildFalse();
             }
         }
@@ -141,8 +145,7 @@ public class ReceptionService extends AbstractService {
 
         builder.setServiceMap(getServiceMap(serviceOpt.get()));
 
-        builder.setReservationDay(java.sql.Date.valueOf(day));
-        builder.setReservationDayTxt(dateFormat.format(day));
+        builder.setReservationDay(dateFormat.format(day));
         builder.setNextDay(dateFormat.format(day.plusDays(1)));
         LocalDate previousDate = day.minusDays(1);
         if (previousDate.isBefore(LocalDate.now())){

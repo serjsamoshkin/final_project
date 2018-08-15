@@ -1,24 +1,24 @@
-package service.dto.reception;
+package service.dto.reception.ProcessReservation;
 
 import entity.model.Master;
 import entity.model.Service;
+import service.dto.AbstractDto;
+import service.dto.AbstractDtoBuilder;
 
 import java.util.Date;
 import java.util.Map;
 
-public class ShowReceptionOutDto {
+public class ProcessReceptionOutDto extends AbstractDto{
 
-    private final Map<Master, Map<Date, Boolean>> mastersSchedule;
+    private final Map<Master, Map<String, Boolean>> mastersSchedule;
     private final  Map<Service, Boolean> serviceMap;
     private final  Date reservationDay;
     private final  String reservationDayTxt;
     private final  String nextDay;
     private final  String previousDay;
 
-    private boolean ok = false;
-
-
-    ShowReceptionOutDto(Map<Master, Map<Date, Boolean>> mastersSchedule, Map<Service, Boolean> serviceMap, Date reservationDay, String reservationDayTxt, String nextDay, String previousDay) {
+    public ProcessReceptionOutDto(boolean ok, Map<Master, Map<String, Boolean>> mastersSchedule, Map<Service, Boolean> serviceMap, Date reservationDay, String reservationDayTxt, String nextDay, String previousDay) {
+        super(ok);
         this.mastersSchedule = mastersSchedule;
         this.serviceMap = serviceMap;
         this.reservationDay = reservationDay;
@@ -27,7 +27,7 @@ public class ShowReceptionOutDto {
         this.previousDay = previousDay;
     }
 
-    public Map<Master, Map<Date, Boolean>> getMastersSchedule() {
+    public Map<Master, Map<String, Boolean>> getMastersSchedule() {
         return mastersSchedule;
     }
 
@@ -51,23 +51,20 @@ public class ShowReceptionOutDto {
         return previousDay;
     }
 
-    public boolean isOk() {
-        return ok;
-    }
 
     public static ShowReceptionOutDtoBuilder getBuilder(){
         return new ShowReceptionOutDtoBuilder();
     }
 
-    public static class ShowReceptionOutDtoBuilder {
-        private  Map<Master, Map<Date, Boolean>> mastersSchedule;
+    public static class ShowReceptionOutDtoBuilder extends AbstractDtoBuilder{
+        private  Map<Master, Map<String, Boolean>> mastersSchedule;
         private  Map<Service, Boolean> serviceMap;
         private  Date reservationDay;
         private  String reservationDayTxt;
         private  String nextDay;
         private  String previousDay;
 
-        public void setMastersSchedule(Map<Master, Map<Date, Boolean>> mastersSchedule) {
+        public void setMastersSchedule(Map<Master, Map<String, Boolean>> mastersSchedule) {
             this.mastersSchedule = mastersSchedule;
         }
 
@@ -95,17 +92,14 @@ public class ShowReceptionOutDto {
             return this;
         }
 
-
-        public ShowReceptionOutDto buildFalse(){
-            ShowReceptionOutDto dto = new ShowReceptionOutDto(null, null, null, null, null, null);
-            dto.ok = false;
-            return dto;
+        @Override
+        public ProcessReceptionOutDto build() {
+            return build(true);
         }
 
-        public ShowReceptionOutDto build(){
-            ShowReceptionOutDto dto = new ShowReceptionOutDto(mastersSchedule, serviceMap, reservationDay, reservationDayTxt, nextDay, previousDay);
-            dto.ok = true;
-            return dto;
+        public ProcessReceptionOutDto build(boolean buildOk){
+            return new ProcessReceptionOutDto(buildOk, mastersSchedule, serviceMap, reservationDay, reservationDayTxt, nextDay, previousDay);
+
         }
 
     }

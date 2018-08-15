@@ -1,13 +1,17 @@
-package service.dto.reception;
+package service.dto.reception.ShowReception;
+
+import service.dto.AbstractDto;
+import service.dto.AbstractDtoBuilder;
 
 import java.util.Optional;
 
-public class ShowReceptionInDto {
+public class ShowReceptionInDto extends AbstractDto{
 
-    private final String day;
-    private final  String service;
+    private String day;
+    private String service;
 
-    ShowReceptionInDto(String day, String service) {
+    public ShowReceptionInDto(boolean ok, String day, String service) {
+        super(ok);
         this.day = day;
         this.service = service;
     }
@@ -24,10 +28,9 @@ public class ShowReceptionInDto {
         return new ShowReceptionInDtoBuilder();
     }
 
-    public static class ShowReceptionInDtoBuilder {
+    public static class ShowReceptionInDtoBuilder extends AbstractDtoBuilder{
         private String day;
-        private  String service;
-
+        private String service;
 
         public ShowReceptionInDtoBuilder setDay(String day) {
             this.day = day;
@@ -39,8 +42,13 @@ public class ShowReceptionInDto {
             return this;
         }
 
-        public ShowReceptionInDto build(){
-            return new ShowReceptionInDto(day, service);
+        @Override
+        public ShowReceptionInDto build() {
+            return build(true);
+        }
+
+        public ShowReceptionInDto build(boolean buildOk){
+            return new ShowReceptionInDto(buildOk, day, service);
         }
 
     }

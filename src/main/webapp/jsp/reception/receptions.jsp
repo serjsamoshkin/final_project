@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="../parts/localized.jsp" %>
+<%@ taglib prefix = "ex" uri = "mytags"%>
 <html>
 <head>
     <%@include file="../parts/header.jsp" %>
@@ -31,7 +32,7 @@
             </div>
             <div class="col-xs-6">
                 <ul class="pager">
-                    <li><a href="#"><fmt:formatDate type="date" value="${reservation_day}"/></a></li>
+                    <li><a href="#"><ex:formatDate shortDate="${reservation_day}"/></a></li>
                 </ul>
             </div>
             <div class="col-xs-3">
@@ -41,8 +42,6 @@
                         <span aria-hidden="true">&rarr;</span></a></li>
                 </ul>
             </div>
-
-
         </nav>
     </div>
 
@@ -64,7 +63,7 @@
                     </c:forEach>
                 </select>
             </div>
-            <input id="day" name="day" type="hidden" value="${reservation_day_txt}">
+            <input id="day" name="day" type="hidden" value="${reservation_day}">
         </form>
     </div>
 
@@ -80,9 +79,10 @@
                     </tr>
                     <c:forEach items="${master.value}" var="schedule">
                         <tr>
-                            <td><fmt:formatDate type="time" value="${schedule.key}"/></td>
+                            <%--<td><fmt:formatDate type="time" value="${schedule.key}"/></td>--%>
+                            <td><ex:formatTime shortTime="${schedule.key}"/></td>
                             <td>
-                                <a href="javascript: submit_reservation('${schedule.key}','${master.key.id}')"><fmt:message key="reserve"/></a>
+                                <a href="javascript: submit_reservation('${reservation_day}', '${schedule.key}','${master.key.id}')"><fmt:message key="reserve"/></a>
                             </td>
                         </tr>
                     </c:forEach>
@@ -92,25 +92,20 @@
     </div>
 </div>
 
-<form method="post" name="submit_reserve_form" action="<c:url value="/reception/process_reservation"/>">
-    <input id="day_time" name="time" type="hidden">
-    <input id="master" name="master" type="hidden">
-    <input id="service_opt" name="filter_service_opt" type="hidden">
-</form>
-<form method="get" name="submit_day_form" action="<c:url value="/reception/show_receptions"/>">
-    <input id="filter_service_opt" name="filter_service_opt" type="hidden">
-</form>
+<form method="get" name="submit_reserve_form" action="<c:url value="/reception/process_reservation"/>"></form>
+<form method="get" name="submit_day_form" action="<c:url value="/reception/show_receptions"/>"></form>
 <script type="text/javascript">
 
     var subm = document.getElementById("filter_service");
     subm.onchange = change_filter_service;
 
-
-    function submit_reservation(day_time, master) {
-        document.getElementById("day_time").value = day_time;
-        document.getElementById("master").value = master;
+    function submit_reservation(day, time, master) {
+        add_day_input(day);
+        add_time_input(time);
+        add_master_input(master);
         var sel = document.getElementById('filter_service');
-        document.getElementById("service_opt").value = sel.options[sel.selectedIndex].value;
+        add_service_input(sel.options[sel.selectedIndex].value);
+
         document.forms["submit_reserve_form"].submit();
     }
 
@@ -119,9 +114,10 @@
     }
 
     function submit_day(day) {
-        add_day_input(day);
         var sel = document.getElementById('filter_service');
-        document.getElementById("filter_service_opt").value = sel.options[sel.selectedIndex].value;
+        add_service_input(sel.options[sel.selectedIndex].value);
+        add_day_input(day);
+
         document.forms["submit_day_form"].submit();
     }
 
@@ -134,7 +130,35 @@
         }).appendTo('form')
     }
 
+    function add_time_input(time) {
+        $('<input>').attr({
+            type: 'hidden',
+            id: 'time',
+            name: 'time',
+            value: time
+        }).appendTo('form')
+    }
 
+    function add_master_input(master) {
+        $('<input>').attr({
+            type: 'hidden',
+            id: 'master',
+            name: 'master',
+            value: master
+        }).appendTo('form')
+    }
+
+    function add_service_input(service) {
+        if (service !== ""){
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'service_opt',
+                name: 'filter_service_opt',
+                value: service
+            }).appendTo('form')
+        }
+
+    }
 </script>
 </body>
 </html>

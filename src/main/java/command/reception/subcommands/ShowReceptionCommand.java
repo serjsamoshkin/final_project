@@ -3,10 +3,9 @@ package command.reception.subcommands;
 import chainCommandSystem.annotation.WebCommand;
 import command.RootCommand;
 import command.reception.ReceptionCommand;
-import entity.model.Service;
 import service.ServiceMapper;
-import service.dto.reception.ShowReceptionInDto;
-import service.dto.reception.ShowReceptionOutDto;
+import service.dto.reception.ShowReception.ShowReceptionInDto;
+import service.dto.reception.ShowReception.ShowReceptionOutDto;
 import service.reception.ReceptionService;
 
 import javax.servlet.ServletContext;
@@ -14,10 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.Optional;
 
 @WebCommand(urlPattern = "/show_receptions",
         parent = ReceptionCommand.class)
@@ -46,7 +41,7 @@ public class ShowReceptionCommand extends RootCommand {
             request.setAttribute("masters_schedule", dto.getMastersSchedule());
             request.setAttribute("service_map", dto.getServiceMap());
             request.setAttribute("reservation_day", dto.getReservationDay());
-            request.setAttribute("reservation_day_txt", dto.getReservationDayTxt());
+            //request.setAttribute("reservation_day_txt", dto.getReservationDayTxt());
             request.setAttribute("next_day", dto.getNextDay());
             request.setAttribute("previous_day", dto.getPreviousDay());
 
