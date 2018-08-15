@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="errorLogPath">${sys:catalina.home}/logs</Property>
+        <!--<Property name="infoLogPath">${sys:rootPath}/logs</Property>-->
+        <Property name="infoLogPath">${sys:catalina.home}/logs</Property>
+        <Property name="appName">loveReadDownloader</Property>
+        <Property name="PatternLayout">%d{HH:mm:ss.SSS} [%t] %5p - %msg%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="ErrorConsole" target="SYSTEM_OUT">
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${PatternLayout} Exception: %ex%n"/>
+        </Console>
+
+        <RollingFile name="ErrorFile"
+                     fileName="${errorLogPath}/${appName}Errors.log"
+                     filePattern="${errorLogPath}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.${appName}Errors.log.zip">
+
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${PatternLayout} Exception: %ex%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="200 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile name="InfoFile"
+                     fileName="${infoLogPath}/${appName}Info.log"
+                     filePattern="${infoLogPath}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.${appName}Info.log.zip">
+
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${PatternLayout}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="DEBUG">
+            <AppenderRef ref="ErrorFile"/>
+            <AppenderRef ref="ErrorConsole"/>
+            <AppenderRef ref="InfoFile"/>
+        </Root>
+
+    </Loggers>
+</Configuration>
