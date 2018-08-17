@@ -1,9 +1,7 @@
 package web.tag;
 
-import util.properties.DateTimePatternsPropertiesReader;
+import util.LocalDateTimeFormatter;
 
-import java.io.IOException;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
@@ -24,12 +22,11 @@ public class TimeFormatterTag extends SimpleTagSupport {
 
         try {
             Locale locale = (Locale) getJspContext().getAttribute("locale", 3);
-            DateTimeFormatter fmtIn = DateTimeFormatter.ofPattern(
-                    DateTimePatternsPropertiesReader.getInstance().getPropertyValue("time_pattern"));
-            DateTimeFormatter fmtOut =  DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
 
-            LocalTime localTime = LocalTime.parse(shortTime, fmtIn);
-            getJspContext().getOut().write(fmtOut.format(localTime));
+            getJspContext().getOut().write(
+                    DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)
+                            .format(LocalDateTimeFormatter.toLocalTime(shortTime))
+            );
         }catch (Exception e){
             throw new JspException(e);
         }

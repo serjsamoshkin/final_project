@@ -56,7 +56,7 @@ public class UserDAO implements GenericDAO<User, Integer> {
         PredicateBuilder<User> predicateBuilder = criteriaBuilder.getPredicateBuilder(clazz);
 
         criteriaBuilder = criteriaBuilder.And(
-                predicateBuilder.Equal("email", value)
+                predicateBuilder.equal("email", value)
         );
 
         List<User> list = controller.getByCriteria(clazz, criteriaBuilder, connection);

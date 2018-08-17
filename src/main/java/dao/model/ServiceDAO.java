@@ -59,7 +59,7 @@ public class ServiceDAO implements GenericDAO<Service, Integer> {
         PredicateBuilder<Service> predicateBuilder = criteriaBuilder.getPredicateBuilder(clazz);
 
         criteriaBuilder = criteriaBuilder.And(
-                predicateBuilder.Equal("name", value)
+                predicateBuilder.equal("name", value)
         );
 
         List<Service> list = controller.getByCriteria(clazz, criteriaBuilder, connection);
@@ -71,5 +71,7 @@ public class ServiceDAO implements GenericDAO<Service, Integer> {
 
         return Optional.of(list.get(0));
     }
+
+
 
 }

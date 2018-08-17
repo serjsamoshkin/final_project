@@ -5,90 +5,91 @@ import entity.model.Service;
 import service.dto.AbstractDto;
 import service.dto.AbstractDtoBuilder;
 
-import java.util.Date;
 import java.util.Map;
 
 public class ProcessReceptionOutDto extends AbstractDto{
 
-    private final Map<Master, Map<String, Boolean>> mastersSchedule;
-    private final  Map<Service, Boolean> serviceMap;
-    private final  Date reservationDay;
-    private final  String reservationDayTxt;
-    private final  String nextDay;
-    private final  String previousDay;
+    private final Map<Service, Boolean> serviceMap;
+    private final Master master;
+    private final Service service;
+    private final String date;
+    private final String time;
+    private final boolean reserved;
 
-    public ProcessReceptionOutDto(boolean ok, Map<Master, Map<String, Boolean>> mastersSchedule, Map<Service, Boolean> serviceMap, Date reservationDay, String reservationDayTxt, String nextDay, String previousDay) {
+
+    public ProcessReceptionOutDto(boolean ok, Map<Service, Boolean> serviceMap, Master master, Service service, String date, String time, boolean reserved) {
         super(ok);
-        this.mastersSchedule = mastersSchedule;
         this.serviceMap = serviceMap;
-        this.reservationDay = reservationDay;
-        this.reservationDayTxt = reservationDayTxt;
-        this.nextDay = nextDay;
-        this.previousDay = previousDay;
-    }
-
-    public Map<Master, Map<String, Boolean>> getMastersSchedule() {
-        return mastersSchedule;
+        this.master = master;
+        this.service = service;
+        this.date = date;
+        this.time = time;
+        this.reserved = reserved;
     }
 
     public Map<Service, Boolean> getServiceMap() {
         return serviceMap;
     }
 
-    public Date getReservationDay() {
-        return reservationDay;
+    public Master getMaster() {
+        return master;
     }
 
-    public String getReservationDayTxt() {
-        return reservationDayTxt;
+    public String getDate() {
+        return date;
     }
 
-    public String getNextDay() {
-        return nextDay;
+    public String getTime() {
+        return time;
     }
 
-    public String getPreviousDay() {
-        return previousDay;
+    public Service getService() {
+        return service;
     }
 
+    public boolean isReserved() {
+        return reserved;
+    }
 
     public static ShowReceptionOutDtoBuilder getBuilder(){
         return new ShowReceptionOutDtoBuilder();
     }
 
     public static class ShowReceptionOutDtoBuilder extends AbstractDtoBuilder{
-        private  Map<Master, Map<String, Boolean>> mastersSchedule;
-        private  Map<Service, Boolean> serviceMap;
-        private  Date reservationDay;
-        private  String reservationDayTxt;
-        private  String nextDay;
-        private  String previousDay;
-
-        public void setMastersSchedule(Map<Master, Map<String, Boolean>> mastersSchedule) {
-            this.mastersSchedule = mastersSchedule;
-        }
+        private Map<Service, Boolean> serviceMap;
+        private Master master;
+        private Service service;
+        private String date;
+        private String time;
+        private boolean reserved;
 
         public ShowReceptionOutDtoBuilder setServiceMap(Map<Service, Boolean> serviceMap) {
             this.serviceMap = serviceMap;
             return this;
         }
 
-        public ShowReceptionOutDtoBuilder setReservationDay(Date reservationDay) {
-            this.reservationDay = reservationDay;
+        public ShowReceptionOutDtoBuilder setMaster(Master master) {
+            this.master = master;
             return this;
         }
 
-        public void setReservationDayTxt(String reservationDayTxt) {
-            this.reservationDayTxt = reservationDayTxt;
-        }
-
-        public ShowReceptionOutDtoBuilder setNextDay(String nextDay) {
-            this.nextDay = nextDay;
+        public ShowReceptionOutDtoBuilder setDate(String date) {
+            this.date = date;
             return this;
         }
 
-        public ShowReceptionOutDtoBuilder setPreviousDay(String previousDay) {
-            this.previousDay = previousDay;
+        public ShowReceptionOutDtoBuilder setTime(String time) {
+            this.time = time;
+            return this;
+        }
+
+        public ShowReceptionOutDtoBuilder setReserved(boolean reserved) {
+            this.reserved = reserved;
+            return this;
+        }
+
+        public ShowReceptionOutDtoBuilder setService(Service service) {
+            this.service = service;
             return this;
         }
 
@@ -97,8 +98,8 @@ public class ProcessReceptionOutDto extends AbstractDto{
             return build(true);
         }
 
-        public ProcessReceptionOutDto build(boolean buildOk){
-            return new ProcessReceptionOutDto(buildOk, mastersSchedule, serviceMap, reservationDay, reservationDayTxt, nextDay, previousDay);
+        protected ProcessReceptionOutDto build(boolean buildOk){
+            return new ProcessReceptionOutDto(buildOk, serviceMap, master, service, date, time, reserved);
 
         }
 

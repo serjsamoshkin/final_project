@@ -56,8 +56,9 @@ public class ShowReceptionOutDto extends AbstractDto {
         private  String nextDay;
         private  String previousDay;
 
-        public void setMastersSchedule(Map<Master, Map<String, Boolean>> mastersSchedule) {
+        public ShowReceptionOutDtoBuilder setMastersSchedule(Map<Master, Map<String, Boolean>> mastersSchedule) {
             this.mastersSchedule = mastersSchedule;
+            return this;
         }
 
         public ShowReceptionOutDtoBuilder setServiceMap(Map<Service, Boolean> serviceMap) {

@@ -58,7 +58,7 @@ public class RoleDAO implements GenericDAO<Role, Integer> {
         PredicateBuilder<Role> predicateBuilder = criteriaBuilder.getPredicateBuilder(clazz);
 
         criteriaBuilder = criteriaBuilder.And(
-                predicateBuilder.Equal("name", value)
+                predicateBuilder.equal("name", value)
         );
 
         List<Role> list = controller.getByCriteria(clazz, criteriaBuilder, connection);

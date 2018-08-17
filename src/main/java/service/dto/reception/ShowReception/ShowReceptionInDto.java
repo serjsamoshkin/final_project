@@ -10,7 +10,7 @@ public class ShowReceptionInDto extends AbstractDto{
     private String day;
     private String service;
 
-    public ShowReceptionInDto(boolean ok, String day, String service) {
+    ShowReceptionInDto(boolean ok, String day, String service) {
         super(ok);
         this.day = day;
         this.service = service;

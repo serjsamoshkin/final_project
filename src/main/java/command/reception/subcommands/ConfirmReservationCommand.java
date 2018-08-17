@@ -3,6 +3,8 @@ package command.reception.subcommands;
 import chainCommandSystem.annotation.WebCommand;
 import command.RootCommand;
 import command.reception.ReceptionCommand;
+import entity.authentication.User;
+import entity.model.Reception;
 import service.ServiceMapper;
 import service.dto.reception.ProcessReservation.ProcessReceptionInDto;
 import service.dto.reception.ProcessReservation.ProcessReceptionOutDto;
@@ -13,13 +15,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 
-@WebCommand(urlPattern = "/process_reservation",
+@WebCommand(urlPattern = "/confirm_reservation",
         parent = ReceptionCommand.class)
-public class ProcessReservationCommand extends RootCommand {
+public class ConfirmReservationCommand extends RootCommand {
 
-    public ProcessReservationCommand(ServletContext servletContext) {
+    public ConfirmReservationCommand(ServletContext servletContext) {
         super(servletContext);
     }
 
@@ -48,10 +51,10 @@ public class ProcessReservationCommand extends RootCommand {
                 // TODO кинуть на стричку с извинениями
                 forward(Page.PAGE_500, request, response);
             }else {
-                request.setAttribute("service_map", dto.getServiceMap());
-                request.setAttribute("date", dto.getDate());
-                request.setAttribute("time", dto.getTime());
-                request.setAttribute("master", dto.getMaster());
+
+                ServiceMapper.getMapper().getService(ReceptionService.class).confirmReservation(dto,
+                        // TODO заменить на ДТО или другой враппер
+                        (User) ((Map<String, Object>)request.getSession().getAttribute("user")).get("obj"));
 
                 forward("/jsp/reception/reservation.jsp", request, response);
             }

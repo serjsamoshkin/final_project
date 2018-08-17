@@ -5,6 +5,8 @@ import myPersistenceSystem.annotations.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @TableName(name = "masters")
 public class Master implements Comparable<Master>{
@@ -53,8 +55,9 @@ public class Master implements Comparable<Master>{
         this.surname = surname;
     }
 
-    public List<MastersService> getMasterServices() {
-        return masterServices;
+    public Set<Service> getMasterServices() {
+        return masterServices.stream().map(sm -> sm.getService())
+                .collect(Collectors.toSet());
     }
 
     public void setMasterServices(List<MastersService> masterServices) {

@@ -61,19 +61,19 @@ public abstract class PredicateBuilder<T> implements Criteria {
         return operator;
     }
 
-    public abstract PredicateBuilder Equal(String fieldName, Object value) throws PersistException;
+    public abstract PredicateBuilder<T> equal(String fieldName, Object value) throws PersistException;
 
-    public abstract PredicateBuilder NotEqual(String fieldName, Object value) throws PersistException;
+    public abstract PredicateBuilder<T> notEqual(String fieldName, Object value) throws PersistException;
 
-    public abstract PredicateBuilder Greater(String fieldName, Object value) throws PersistException;
+    public abstract PredicateBuilder<T> greater(String fieldName, Object value) throws PersistException;
 
-    public abstract PredicateBuilder Less(String fieldName, Object value) throws PersistException;
+    public abstract PredicateBuilder<T> less(String fieldName, Object value) throws PersistException;
 
-    public abstract PredicateBuilder GreaterEqual(String fieldName, Object value) throws PersistException;
+    public abstract PredicateBuilder<T> greaterEqual(String fieldName, Object value) throws PersistException;
 
-    public abstract PredicateBuilder LessEqual(String fieldName, Object value) throws PersistException;
+    public abstract PredicateBuilder<T> lessEqual(String fieldName, Object value) throws PersistException;
 
-    public abstract PredicateBuilder In(String fieldName, Object value) throws PersistException;
+    public abstract PredicateBuilder<T> in(String fieldName, Object value) throws PersistException;
 
     protected CriteriaBuilder<T> getRoot(){
         return root;

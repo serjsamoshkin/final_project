@@ -12,7 +12,6 @@ import myPersistenceSystem.criteria.predicates.PredicateBuilder;
 
 import java.sql.Connection;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Implement DAO of Master entity.
@@ -56,24 +55,6 @@ public class MasterDAO implements GenericDAO<Master, Integer> {
 
     public List<Master> getMasterListByService(Service service, Connection connection){
 
-//        CriteriaBuilder<MastersService> criteriaBuilder = controller.getCriteriaBuilder(MastersService.class);
-//        PredicateBuilder<MastersService> predicateBuilder = criteriaBuilder.getPredicateBuilder(MastersService.class);
-//
-//        criteriaBuilder = criteriaBuilder.And(
-//                predicateBuilder.Equal("service", service.getId())
-//        );
-//
-//        List<MastersService> list = controller.getByCriteria(MastersService.class, criteriaBuilder, connection);
-//        if (list.isEmpty()) {
-//            return new HashSet<>();
-//        }
-//
-//        Set<Master> masters = new HashSet<>();
-//        for (MastersService i : list) {
-//            masters.add(i.getMaster());
-//        }
-//        return masters;
-
         CriteriaBuilder<Master> criteriaBuilder = controller.getCriteriaBuilder(Master.class);
         PredicateBuilder<Service> predicateBuilder = criteriaBuilder.getPredicateBuilder(Service.class);
 
@@ -81,7 +62,7 @@ public class MasterDAO implements GenericDAO<Master, Integer> {
         criteriaBuilder = criteriaBuilder.addJoin(MastersService.class, "service", Service.class, "id");
 
         criteriaBuilder = criteriaBuilder.And(
-                predicateBuilder.Equal("name", service.getName())
+                predicateBuilder.equal("name", service.getName())
         );
 
         List<Master> list = controller.getByCriteria(Master.class, criteriaBuilder, connection);

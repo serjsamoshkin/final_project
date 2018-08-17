@@ -4,6 +4,7 @@ import myPersistenceSystem.PersistException;
 import myPersistenceSystem.annotations.Column;
 import myPersistenceSystem.annotations.JoinColumn;
 import myPersistenceSystem.annotations.ManyToOne;
+import myPersistenceSystem.annotations.OneToOne;
 import myPersistenceSystem.criteria.CriteriaBuilder;
 import myPersistenceSystem.criteria.predicates.Operator;
 import myPersistenceSystem.criteria.predicates.PredicateBuilder;
@@ -81,7 +82,7 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
 
     // TODO переписать генерацию подчиненного объекта через один метод, в который передавать только тип
     @Override
-    public PredicateBuilder Equal(String fieldName, Object value) throws PersistException {
+    public PredicateBuilder equal(String fieldName, Object value) throws PersistException {
         return new MySqlPredicateBuilder<>(
                 getEntityClazz(),
                 getRoot(),
@@ -92,7 +93,7 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
     }
 
     @Override
-    public PredicateBuilder NotEqual(String fieldName, Object value) throws PersistException {
+    public PredicateBuilder<T> notEqual(String fieldName, Object value) throws PersistException {
         return new MySqlPredicateBuilder<>(
                 getEntityClazz(),
                 getRoot(),
@@ -103,7 +104,7 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
     }
 
     @Override
-    public PredicateBuilder Greater(String fieldName, Object value) throws PersistException {
+    public PredicateBuilder<T> greater(String fieldName, Object value) throws PersistException {
         return new MySqlPredicateBuilder<>(
                 getEntityClazz(),
                 getRoot(),
@@ -114,7 +115,7 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
     }
 
     @Override
-    public PredicateBuilder Less(String fieldName, Object value) throws PersistException {
+    public PredicateBuilder<T> less(String fieldName, Object value) throws PersistException {
         return new MySqlPredicateBuilder<>(
                 getEntityClazz(),
                 getRoot(),
@@ -125,7 +126,7 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
     }
 
     @Override
-    public PredicateBuilder GreaterEqual(String fieldName, Object value) throws PersistException {
+    public PredicateBuilder<T> greaterEqual(String fieldName, Object value) throws PersistException {
         return new MySqlPredicateBuilder<>(
                 getEntityClazz(),
                 getRoot(),
@@ -136,7 +137,7 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
     }
 
     @Override
-    public PredicateBuilder LessEqual(String fieldName, Object value) throws PersistException {
+    public PredicateBuilder<T> lessEqual(String fieldName, Object value) throws PersistException {
         return new MySqlPredicateBuilder<>(
                 getEntityClazz(),
                 getRoot(),
@@ -147,7 +148,7 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
     }
 
     @Override
-    public PredicateBuilder In(String fieldName, Object value) throws PersistException {
+    public PredicateBuilder<T> in(String fieldName, Object value) throws PersistException {
         return new MySqlPredicateBuilder<>(
                 getEntityClazz(),
                 getRoot(),
@@ -164,7 +165,8 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
         Field field = Reflect.getFieldByName(getEntityClazz(), fieldName);
         if (field.isAnnotationPresent(Column.class)){
             dbField = field.getAnnotation(Column.class).name();
-        }else if (field.isAnnotationPresent(ManyToOne.class) && field.isAnnotationPresent(JoinColumn.class)){
+        }else if ((field.isAnnotationPresent(ManyToOne.class) ||  field.isAnnotationPresent(OneToOne.class))
+                && field.isAnnotationPresent(JoinColumn.class)){
             dbField = field.getAnnotation(JoinColumn.class).name();
         }
         else {

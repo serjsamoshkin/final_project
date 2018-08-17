@@ -49,35 +49,38 @@ public class DataInitializerService extends AbstractService{
             Master master1 = new Master();
             master1.setUser(userService.createUser("Иваненко", "ivanenko@me.me", "1"));
             master1.setName("Анна");
-            master1.setName("Иванова");
+            master1.setSurname("Иваненко");
 
             masterDAO.save(master1, con);
 
             Master master2 = new Master();
             master2.setUser(userService.createUser("Петренко", "petrenko@me.me", "1"));
             master2.setName("Инна");
-            master2.setName("Петрова");
+            master2.setSurname("Петренко");
 
             masterDAO.save(master2, con);
 
             Master master3 = new Master();
             master3.setUser(userService.createUser("Сидоренко", "sidorenko@me.me", "1"));
             master3.setName("Дарья");
-            master3.setName("Сидорова");
+            master3.setSurname("Сидоренко");
 
             masterDAO.save(master3, con);
 
 
             Service service1 = new Service();
             service1.setName("Макияж");
+            service1.setDuration(2);
             serviceDAO.save(service1, con);
 
             Service service2 = new Service();
             service2.setName("Стрижка");
+            service2.setDuration(2);
             serviceDAO.save(service2, con);
 
             Service service3 = new Service();
             service3.setName("Маникюр");
+            service3.setDuration(2);
             serviceDAO.save(service3, con);
 
             MastersService mastersService1 = new MastersService();
