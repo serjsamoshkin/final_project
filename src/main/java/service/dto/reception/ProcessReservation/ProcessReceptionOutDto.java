@@ -1,7 +1,7 @@
 package service.dto.reception.ProcessReservation;
 
-import entity.model.Master;
-import entity.model.Service;
+import model.entity.model.Master;
+import model.entity.model.Service;
 import service.dto.AbstractDto;
 import service.dto.AbstractDtoBuilder;
 

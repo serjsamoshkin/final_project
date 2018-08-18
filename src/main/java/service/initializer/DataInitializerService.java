@@ -1,22 +1,17 @@
 package service.initializer;
 
-import dao.DaoMapper;
-import dao.authentication.RoleDAO;
-import dao.authentication.UserDAO;
-import dao.model.MasterDAO;
-import dao.model.MastersServiceDAO;
-import dao.model.ServiceDAO;
-import entity.authentication.User;
-import entity.model.Master;
-import entity.model.MastersService;
-import entity.model.Service;
-import myPersistenceSystem.PersistException;
-import myPersistenceSystem.RowNotUniqueException;
+import model.dao.DaoMapper;
+import model.dao.model.MasterDAO;
+import model.dao.model.MastersServiceDAO;
+import model.dao.model.ServiceDAO;
+import model.entity.model.Master;
+import model.entity.model.MastersService;
+import model.entity.model.Service;
+import persistenceSystem.RowNotUniqueException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import service.AbstractService;
 import service.ServiceMapper;
-import service.authentication.RoleService;
 import service.authentication.UserService;
 
 import javax.servlet.ServletContext;

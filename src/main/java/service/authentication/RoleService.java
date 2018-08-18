@@ -1,10 +1,10 @@
 package service.authentication;
 
-import dao.DaoMapper;
-import dao.authentication.RoleDAO;
-import entity.authentication.Role;
-import myPersistenceSystem.PersistException;
-import myPersistenceSystem.RowNotUniqueException;
+import model.dao.DaoMapper;
+import model.dao.authentication.RoleDAO;
+import model.entity.authentication.Role;
+import persistenceSystem.PersistException;
+import persistenceSystem.RowNotUniqueException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import service.AbstractService;

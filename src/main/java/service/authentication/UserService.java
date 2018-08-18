@@ -1,13 +1,13 @@
 package service.authentication;
 
-import dao.DaoMapper;
-import dao.authentication.UserDAO;
-import dao.authentication.UserRoleDAO;
-import entity.authentication.Role;
-import entity.authentication.User;
-import entity.authentication.UsersRole;
-import myPersistenceSystem.PersistException;
-import myPersistenceSystem.RowNotUniqueException;
+import model.dao.DaoMapper;
+import model.dao.authentication.UserDAO;
+import model.dao.authentication.UserRoleDAO;
+import model.entity.authentication.Role;
+import model.entity.authentication.User;
+import model.entity.authentication.UsersRole;
+import persistenceSystem.PersistException;
+import persistenceSystem.RowNotUniqueException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;

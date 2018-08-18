@@ -1,11 +1,10 @@
 package service.dto.reception.ShowReception;
 
-import entity.model.Master;
-import entity.model.Service;
+import model.entity.model.Master;
+import model.entity.model.Service;
 import service.dto.AbstractDto;
 import service.dto.AbstractDtoBuilder;
 
-import java.util.Date;
 import java.util.Map;
 
 public class ShowReceptionOutDto extends AbstractDto {

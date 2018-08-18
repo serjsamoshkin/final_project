@@ -1,15 +1,15 @@
 package service.reception;
 
-import dao.DaoMapper;
-import dao.model.MasterDAO;
-import dao.model.ReceptionDAO;
-import dao.model.ServiceDAO;
-import entity.authentication.User;
-import entity.model.Master;
-import entity.model.Reception;
-import entity.model.Service;
-import myPersistenceSystem.PersistException;
-import myPersistenceSystem.RowNotUniqueException;
+import model.dao.DaoMapper;
+import model.dao.model.MasterDAO;
+import model.dao.model.ReceptionDAO;
+import model.dao.model.ServiceDAO;
+import model.entity.authentication.User;
+import model.entity.model.Master;
+import model.entity.model.Reception;
+import model.entity.model.Service;
+import persistenceSystem.PersistException;
+import persistenceSystem.RowNotUniqueException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import service.AbstractService;
@@ -150,6 +150,10 @@ public class ReceptionService extends AbstractService {
         reception.setDay(LocalDateTimeFormatter.toSqlDate(receptionDto.getDate()));
         reception.setTime(LocalDateTimeFormatter.toSqlTime(receptionDto.getTime()));
 
+        LocalTime localEndTime = LocalDateTimeFormatter.toLocalTime(receptionDto.getTime())
+                .plusHours(receptionDto.getService().getDuration());
+        reception.setEndTime(LocalDateTimeFormatter.toSqlTime(localEndTime));
+
         reception.setMaster(receptionDto.getMaster());
         reception.setService(receptionDto.getService());
 
@@ -163,7 +167,7 @@ public class ReceptionService extends AbstractService {
                 boolean reserved = DaoMapper.getMapper().getDao(ReceptionDAO.class).checkReservationInSchedule(
                         LocalDateTimeFormatter.toLocalDate(receptionDto.getDate()),
                         LocalDateTimeFormatter.toLocalTime(receptionDto.getTime()),
-                        LocalDateTimeFormatter.toLocalTime(receptionDto.getTime()).plusHours(receptionDto.getService().getDuration()),
+                        localEndTime,
                         receptionDto.getMaster(),
                         Optional.of(reception.getId()),
                         connection);
