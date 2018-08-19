@@ -3,8 +3,8 @@ package web.listners;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import service.ServiceMapper;
-import service.authentication.UserService;
+import model.service.ServiceMapper;
+import model.service.authentication.UserService;
 import web.pageActivator.ActivePage;
 
 import javax.servlet.annotation.WebListener;

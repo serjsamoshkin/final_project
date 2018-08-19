@@ -1,7 +1,7 @@
-package command.registration;
+package web.command.registration;
 
 import web.chainCommandSystem.annotation.WebCommand;
-import command.RootCommand;
+import web.command.RootCommand;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

@@ -6,7 +6,7 @@ import model.dao.DaoMapper;
 import persistenceSystem.sql.MySqlJDBCDaoController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import service.ServiceMapper;
+import model.service.ServiceMapper;
 
 
 import javax.naming.Context;
@@ -44,7 +44,7 @@ public class ContextListener implements ServletContextListener{
         }
 
         // TODO подумать как не хранить в контексте
-        Command<String> rootCommand = new CommandBuilder().build(context, "command");
+        Command<String> rootCommand = new CommandBuilder().build(context, "web.command");
 
         // TODO ничего не хранить в контексте
         context.setAttribute("rootCommand", rootCommand);

@@ -1,13 +1,13 @@
-package command.login.subcommands;
+package web.command.login.subcommands;
 
 import web.chainCommandSystem.annotation.WebCommand;
-import command.RootCommand;
-import command.login.LogInCommand;
+import web.command.RootCommand;
+import web.command.login.LogInCommand;
 import model.entity.authentication.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import service.ServiceMapper;
-import service.authentication.UserService;
+import model.service.ServiceMapper;
+import model.service.authentication.UserService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

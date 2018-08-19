@@ -1,13 +1,13 @@
-package command.reception.subcommands;
+package web.command.reception.subcommands;
 
 import web.chainCommandSystem.annotation.WebCommand;
-import command.RootCommand;
-import command.reception.ReceptionCommand;
+import web.command.RootCommand;
+import web.command.reception.ReceptionCommand;
 import model.entity.authentication.User;
-import service.ServiceMapper;
-import service.dto.reception.ProcessReservation.ProcessReceptionInDto;
-import service.dto.reception.ProcessReservation.ProcessReceptionOutDto;
-import service.reception.ReceptionService;
+import model.service.ServiceMapper;
+import util.dto.reception.ProcessReservation.ProcessReceptionInDto;
+import util.dto.reception.ProcessReservation.ProcessReceptionOutDto;
+import model.service.reception.ReceptionService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -47,15 +47,18 @@ public class ConfirmReservationCommand extends RootCommand {
 
         if (dto.isOk()) {
             if (dto.isReserved()){
-                // TODO кинуть на стричку с извинениями
-                forward(Page.PAGE_500, request, response);
+                forward("/jsp/reception/reservation_failed.jsp", request, response);
             }else {
 
-                ServiceMapper.getMapper().getService(ReceptionService.class).confirmReservation(dto,
+                boolean done = ServiceMapper.getMapper().getService(ReceptionService.class).confirmReservation(dto,
                         // TODO заменить на ДТО или другой враппер
                         (User) ((Map<String, Object>)request.getSession().getAttribute("user")).get("obj"));
 
-                forward("/jsp/reception/reservation.jsp", request, response);
+                if (done) {
+                    forward("/jsp/reception/reservation_done.jsp", request, response);
+                }else {
+                    forward("/jsp/reception/reservation_failed.jsp", request, response);
+                }
             }
         }else {
             forward(Page.PAGE_500, request, response);

@@ -1,4 +1,4 @@
-package command;
+package web.command;
 
 import web.chainCommandSystem.Command;
 import web.chainCommandSystem.annotation.WebCommand;
@@ -99,10 +99,10 @@ public class RootCommand extends Command<String> {
                 comm = super.getCommand(servletPath + "/*");
             }
         } else if (pathInfo == null || pathInfo.equals("/")) {
-            // first level web.command has handler in executeCommand() body method
+            // first level command has handler in executeCommand() body method
             comm = command;
         } else if (urlPattern.equals(pathInfo) || urlPattern.equals(pathInfo + "/*")) {
-            // self invoked web.command, need to execute executeCommand() method
+            // self invoked command, need to execute executeCommand() method
             comm = command;
         } else {
             comm = super.getCommand(pathInfo);

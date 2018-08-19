@@ -11,6 +11,7 @@ import persistenceSystem.criteria.predicates.PredicateBuilder;
 import persistenceSystem.util.Reflect;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +61,6 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
     @Override
     public String getText() throws PersistException {
 
-        getRoot().setParameter(getValue());
 
         Operator operator = getOperator();
 
@@ -71,9 +71,26 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
         stringBuilder.append(matchingMap.get(operator));
 
         if (operator == Operator.IN){
-            stringBuilder.append(" (?) ");
+            stringBuilder.append(" (");
+            Object local = getValue();
+            if (local instanceof Collection){
+                if (((Collection) local).isEmpty()){
+                    throw new PersistException("Collection passed to 'In' predicate is empty!");
+                }
+                for (Object el:
+                        (Collection)local) {
+                    stringBuilder.append("?,");
+                    getRoot().setParameter(el);
+                }
+                stringBuilder.deleteCharAt(stringBuilder.length()-1);
+                stringBuilder.append(") ");
+            }else {
+                throw new PersistException("value passed to 'In' predicate is not collection!" );
+            }
+
         }else {
             stringBuilder.append(" ? ");
+            getRoot().setParameter(getValue());
         }
 
         return  stringBuilder.toString();
@@ -148,7 +165,7 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
     }
 
     @Override
-    public PredicateBuilder<T> in(String fieldName, Object value) throws PersistException {
+    public PredicateBuilder<T> in(String fieldName, Collection<?> value) throws PersistException {
         return new MySqlPredicateBuilder<>(
                 getEntityClazz(),
                 getRoot(),

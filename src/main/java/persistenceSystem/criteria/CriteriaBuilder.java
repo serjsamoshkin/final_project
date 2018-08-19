@@ -5,6 +5,7 @@ import persistenceSystem.criteria.predicates.PredicateBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 public abstract class CriteriaBuilder<T> implements Criteria {
     private Combinator type;
@@ -16,6 +17,8 @@ public abstract class CriteriaBuilder<T> implements Criteria {
 
     private CriteriaBuilder<T> root;
     private ArrayList<Object> parameters = new ArrayList<>();
+
+    private String queryText;
 
     /**
      * Root level CriteriaBuilder can only be obtained from JDBCDaoController subtypes.
@@ -37,19 +40,39 @@ public abstract class CriteriaBuilder<T> implements Criteria {
         this.conditions.addAll(Arrays.asList(condition));
     }
 
+
+
     public abstract CriteriaBuilder<T> And(Criteria... condition);
 
     public abstract CriteriaBuilder<T> Or(Criteria... condition);
+
+    public abstract CriteriaBuilder<T> rowQuery(String query, Collection<?> params);
 
     public abstract<E> PredicateBuilder<E> getPredicateBuilder(Class<E> clazz) throws PersistException;
 
     public abstract  <L, R> CriteriaBuilder<T> addJoin(Class<L> left, String leftFieldName, Class<R> right, String rightFieldName);
 
+    public abstract ArrayList<JoinTable<?, ?>> getTableJoins();
+
     public ArrayList<JoinTable<?, ?>> getJoins() {
         return joins;
     }
 
-    public abstract ArrayList<JoinTable<?, ?>> getTableJoins();
+    protected void setQueryText(String text){
+        if (getRoot() == null){
+            this.queryText = text;
+        }else {
+            getRoot().queryText = text;
+        }
+    }
+
+    public String getQueryText() {
+        if (getRoot() == null){
+            return this.queryText;
+        }else {
+            return getRoot().queryText;
+        }
+    }
 
     protected Combinator getType() {
         return type;
@@ -68,7 +91,12 @@ public abstract class CriteriaBuilder<T> implements Criteria {
     }
 
     public final void setParameter(Object value){
-        parameters.add(value);
+        if (getRoot() == null){
+            parameters.add(value);
+        }else {
+            getRoot().parameters.add(value);
+        }
+
     }
 
     public final ArrayList<Object> getParameters(){

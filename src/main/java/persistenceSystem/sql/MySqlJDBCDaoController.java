@@ -162,16 +162,22 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
 
         List<T> list;
 
-        StringBuilder str = new StringBuilder(" SELECT ")
-                .append(getSQLFieldsName(clazz))
-                .append(" FROM ")
-                .append(getSQLTableName(clazz));
+        StringBuilder str;
+        if (criteriaBuilder.getQueryText() == null) {
 
-        criteriaBuilder.getTableJoins().forEach(c -> str.append(c.getText()));
+            str = new StringBuilder(" SELECT ")
+                    .append(getSQLFieldsName(clazz))
+                    .append(" FROM ")
+                    .append(getSQLTableName(clazz));
 
-        str.append(" WHERE ");
+            criteriaBuilder.getTableJoins().forEach(c -> str.append(c.getText()));
 
-        str.append(criteriaBuilder.getText());
+            str.append(" WHERE ");
+
+            str.append(criteriaBuilder.getText());
+        }else {
+            str = new StringBuilder(criteriaBuilder.getQueryText());
+        }
 
         try (PreparedStatement statement = connection.prepareStatement(str.toString())) {
 

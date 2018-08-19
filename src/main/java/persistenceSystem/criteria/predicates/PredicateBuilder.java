@@ -4,6 +4,8 @@ import persistenceSystem.PersistException;
 import persistenceSystem.criteria.Criteria;
 import persistenceSystem.criteria.CriteriaBuilder;
 
+import java.util.Collection;
+
 /**
  * Base class for all Predicates in Criteria object
  * @param <T> entry type
@@ -73,7 +75,7 @@ public abstract class PredicateBuilder<T> implements Criteria {
 
     public abstract PredicateBuilder<T> lessEqual(String fieldName, Object value) throws PersistException;
 
-    public abstract PredicateBuilder<T> in(String fieldName, Object value) throws PersistException;
+    public abstract PredicateBuilder<T> in(String fieldName, Collection<?> value) throws PersistException;
 
     protected CriteriaBuilder<T> getRoot(){
         return root;

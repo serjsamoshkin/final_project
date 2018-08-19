@@ -44,7 +44,7 @@ public abstract class Command<T>{
     // Сюда хорошо ложится ствой таг, чтобы не извращаться с <?> параметризированными МАПами
 
     /**
-     * Method is implementation of pattern Chain of responsibility, Command is routed to another web.command or invoke executeCommand method.
+     * Method is implementation of pattern Chain of responsibility, Command is routed to another command or invoke executeCommand method.
      * @param request
      * @param response
      * @throws ServletException
@@ -53,7 +53,7 @@ public abstract class Command<T>{
     public abstract void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
 
     /**
-     * Method is implementation of pattern Command. Each web.command had to override this method.
+     * Method is implementation of pattern Command. Each command had to override this method.
      * @param request
      * @param response
      * @throws ServletException

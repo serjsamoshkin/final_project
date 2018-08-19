@@ -1,7 +1,7 @@
-package command.login;
+package web.command.login;
 
 import web.chainCommandSystem.annotation.WebCommand;
-import command.RootCommand;
+import web.command.RootCommand;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

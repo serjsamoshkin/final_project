@@ -1,12 +1,12 @@
-package command.admin.subcommands;
+package web.command.admin.subcommands;
 
 import web.chainCommandSystem.annotation.WebCommand;
-import command.RootCommand;
-import command.admin.AdminCommand;
+import web.command.RootCommand;
+import web.command.admin.AdminCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import service.ServiceMapper;
-import service.initializer.DataInitializerService;
+import model.service.ServiceMapper;
+import model.service.initializer.DataInitializerService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

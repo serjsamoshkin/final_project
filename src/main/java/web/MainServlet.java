@@ -1,7 +1,7 @@
 package web;
 
 
-import command.RootCommand;
+import web.command.RootCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

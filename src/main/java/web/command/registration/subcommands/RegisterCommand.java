@@ -1,14 +1,14 @@
-package command.registration.subcommands;
+package web.command.registration.subcommands;
 
 import web.chainCommandSystem.annotation.WebCommand;
-import command.RootCommand;
-import command.registration.RegistrationCommand;
+import web.command.RootCommand;
+import web.command.registration.RegistrationCommand;
 import model.entity.authentication.User;
 import persistenceSystem.RowNotUniqueException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import service.ServiceMapper;
-import service.authentication.UserService;
+import model.service.ServiceMapper;
+import model.service.authentication.UserService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

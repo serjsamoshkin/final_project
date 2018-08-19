@@ -7,10 +7,7 @@ import persistenceSystem.criteria.CriteriaBuilder;
 import persistenceSystem.criteria.JoinTable;
 import persistenceSystem.criteria.predicates.PredicateBuilder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class MySqlCriteriaBuilder<T> extends CriteriaBuilder<T> {
 
@@ -51,9 +48,23 @@ public class MySqlCriteriaBuilder<T> extends CriteriaBuilder<T> {
                 condition);
     }
 
+    public CriteriaBuilder<T> rowQuery(String query, Collection<?> params){
+        CriteriaBuilder<T> builder = new MySqlCriteriaBuilder<>(getEntityClazz(),
+                this,
+                null,
+                (Criteria) () -> null);
+        super.setQueryText(query);
+        for (Object p :
+                params) {
+            builder.setParameter(p);
+        }
+
+        return builder;
+    }
+
     @Override
     public <E> PredicateBuilder<E> getPredicateBuilder(Class<E> clazz) throws PersistException {
-        return new MySqlPredicateBuilder<E>(clazz, this);
+        return new MySqlPredicateBuilder<>(clazz, this);
     }
 
     @Override

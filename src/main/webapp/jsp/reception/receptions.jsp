@@ -64,6 +64,15 @@
                 </select>
             </div>
             <input id="day" name="day" type="hidden" value="${reservation_day}">
+            <fmt:message key="duration"/>:
+            <c:choose>
+            <c:when test="${hours_duration != 0}">
+                ${hours_duration} <fmt:message key="hours"/>
+            </c:when>
+                <c:when test="${minutes_duration != 0}">
+                    ${minutes_duration} <fmt:message key="minutes"/>
+                </c:when>
+        </c:choose>
         </form>
     </div>
 
@@ -82,7 +91,14 @@
                             <%--<td><fmt:formatDate type="time" value="${schedule.key}"/></td>--%>
                             <td><ex:formatTime shortTime="${schedule.key}"/></td>
                             <td>
-                                <a href="javascript: submit_reservation('${reservation_day}', '${schedule.key}','${master.key.id}')"><fmt:message key="reserve"/></a>
+                                <c:choose>
+                                    <c:when test="${schedule.value == false}">
+                                        <a href="javascript: submit_reservation('${reservation_day}', '${schedule.key}','${master.key.id}')"><fmt:message key="reserve"/></a>
+                                    </c:when>
+                                    <c:otherwise>
+                                     <fmt:message key="reserved"/>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                         </tr>
                     </c:forEach>
@@ -157,7 +173,6 @@
                 value: service
             }).appendTo('form')
         }
-
     }
 </script>
 </body>

@@ -1,12 +1,12 @@
-package command.reception.subcommands;
+package web.command.reception.subcommands;
 
 import web.chainCommandSystem.annotation.WebCommand;
-import command.RootCommand;
-import command.reception.ReceptionCommand;
-import service.ServiceMapper;
-import service.dto.reception.ProcessReservation.ProcessReceptionInDto;
-import service.dto.reception.ProcessReservation.ProcessReceptionOutDto;
-import service.reception.ReceptionService;
+import web.command.RootCommand;
+import web.command.reception.ReceptionCommand;
+import model.service.ServiceMapper;
+import util.dto.reception.ProcessReservation.ProcessReceptionInDto;
+import util.dto.reception.ProcessReservation.ProcessReceptionOutDto;
+import model.service.reception.ReceptionService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -52,6 +52,9 @@ public class ProcessReservationCommand extends RootCommand {
                 request.setAttribute("date", dto.getDate());
                 request.setAttribute("time", dto.getTime());
                 request.setAttribute("master", dto.getMaster());
+                request.setAttribute("hours_duration", dto.getHours());
+                request.setAttribute("minutes_duration", dto.getMinutes());
+                request.setAttribute("time_end", dto.getEndTime());
 
                 forward("/jsp/reception/reservation.jsp", request, response);
             }

@@ -1,12 +1,12 @@
-package command.reception.subcommands;
+package web.command.reception.subcommands;
 
 import web.chainCommandSystem.annotation.WebCommand;
-import command.RootCommand;
-import command.reception.ReceptionCommand;
-import service.ServiceMapper;
-import service.dto.reception.ShowReception.ShowReceptionInDto;
-import service.dto.reception.ShowReception.ShowReceptionOutDto;
-import service.reception.ReceptionService;
+import web.command.RootCommand;
+import web.command.reception.ReceptionCommand;
+import model.service.ServiceMapper;
+import util.dto.reception.ShowReception.ShowReceptionInDto;
+import util.dto.reception.ShowReception.ShowReceptionOutDto;
+import model.service.reception.ReceptionService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -44,6 +44,8 @@ public class ShowReceptionCommand extends RootCommand {
             //request.setAttribute("reservation_day_txt", dto.getReservationDayTxt());
             request.setAttribute("next_day", dto.getNextDay());
             request.setAttribute("previous_day", dto.getPreviousDay());
+            request.setAttribute("hours_duration", dto.getHours());
+            request.setAttribute("minutes_duration", dto.getMinutes());
 
             forward("/jsp/reception/receptions.jsp", request, response);
         }else {
