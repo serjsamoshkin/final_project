@@ -1,5 +1,6 @@
 package web.command.login.subcommands;
 
+import util.wrappers.WrappedUser;
 import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
 import web.command.login.LogInCommand;
@@ -37,8 +38,8 @@ public class ConfirmLogInCommand extends RootCommand {
         Optional<User> user = service.getAuthenticatedUser(email, password);
 
         if (user.isPresent()){
-            Map<String, Object> userAttrMap = service.getWrappedUser(user.get());
-            request.getSession().setAttribute("user", userAttrMap);
+            WrappedUser wrappedUser = WrappedUser.of(user.get());
+            request.getSession().setAttribute("user", wrappedUser);
             forward(Page.DEF, request, response);
         }else {
             // TODO поулчить страничку из хидера

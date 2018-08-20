@@ -18,6 +18,9 @@ import java.util.*;
 public class MySqlJDBCDaoController extends JDBCDaoController {
 
 
+    /**
+     * {@inheritDoc}
+     */
     public <T, PK> T getByPK(PK key, Class<T> clazz, Connection connection) throws PersistException {
         List<T> list;
 
@@ -47,6 +50,9 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public <T> List<T> getALL(Class<T> clazz, Connection connection) throws PersistException {
         List<T> list;
 
@@ -66,11 +72,14 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
         return list;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public <T> void save(T object, Connection connection) throws PersistException, RowNotUniqueException {
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>) object.getClass();
 
-        if (getEntryByObject(clazz, object).isPresent()) {
+        if (getEntryByPK(clazz, getId(object)).isPresent()) {
             update(object, connection);
             return;
         }
@@ -92,15 +101,21 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             throw new PersistException(e);
         }
 
+        String version = getVersionSQLName(clazz);
+        if (!version.isEmpty()){
+            version += ", ";
+        }
+
         StringBuilder str = new StringBuilder(" SELECT ")
                 .append(getSQLIdName(clazz))
+                .append(version)
                 .append(" FROM ")
                 .append(getSQLTableName(clazz))
                 .append(" WHERE ")
                 .append(getSQLIdName(clazz))
                 .append(" = last_insert_id()");
 
-        try (PreparedStatement statement = connection.prepareStatement(str.toString());) {
+        try (PreparedStatement statement = connection.prepareStatement(str.toString())) {
 
             ResultSet rs = statement.executeQuery();
             if (!rs.next()) {
@@ -109,29 +124,49 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                 throw new PersistException("Exception on find primary key of new persist data");
             }
             setId(object, rs.getObject(1));
+            if (clazz.isAnnotationPresent(VersionControl.class)){
+                setVersion(object, rs.getObject(2));
+            }
         } catch (Exception e) {
             // TODO сделать транзакции
             //pull.rollback();
             throw new PersistException(e);
         }
+
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public <T> void update(T object, Connection connection) throws PersistException {
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>) object.getClass();
 
-        String sql = getUpdateQuery(clazz);
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            prepareStatementForUpdate(statement, object);
-            int count = statement.executeUpdate();
-            if (count != 1) {
-                throw new PersistException("On update modify more then 1 record: " + count);
+        synchronized (clazz) {
+            if (clazz.isAnnotationPresent(VersionControl.class)) {
+                if (checkVersion(clazz, object, connection)) {
+                    setVersion(object, getVersion(object) + 1);
+                } else {
+                    throw new ConcurrentModificationException();
+                }
             }
-        } catch (Exception e) {
-            throw new PersistException(e);
+
+            String sql = getUpdateQuery(clazz);
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                prepareStatementForUpdate(statement, object);
+                int count = statement.executeUpdate();
+                if (count != 1) {
+                    throw new PersistException("On update modify more then 1 record: " + count);
+                }
+            } catch (Exception e) {
+                throw new PersistException(e);
+            }
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public <T> void delete(T object, Connection connection) throws PersistException {
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>) object.getClass();
@@ -150,12 +185,16 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
     }
 
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public <T> CriteriaBuilder<T> getCriteriaBuilder(Class<T> clazz) {
         return new MySqlCriteriaBuilder<>(clazz);
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public <T> List<T> getByCriteria(Class<T> clazz,
                                      CriteriaBuilder<T> criteriaBuilder,
                                      Connection connection) throws PersistException {
@@ -198,6 +237,38 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
     }
 
 
+    private <T> boolean checkVersion(Class<T> clazz, T obj, Connection connection){
+        int ver = getVersion(obj);
+        StringBuilder str = new StringBuilder(" SELECT ")
+                .append(getVersionSQLName(clazz))
+                .append(" FROM ")
+                .append(getSQLTableName(clazz))
+                .append(" WHERE ")
+                .append(getSQLIdName(clazz))
+                .append(" = ?");
+
+        try (PreparedStatement statement = connection.prepareStatement(str.toString())) {
+            statement.setObject(1, getId(obj));
+            ResultSet rs = statement.executeQuery();
+            if (!rs.next()) {
+                // TODO сделать транзакции
+                //pull.rollback();
+                throw new PersistException("Exception on find primary key of new persist data");
+            }
+            if (rs.getInt(1) != ver){
+                return false;
+            }
+
+        } catch (Exception e) {
+            // TODO сделать транзакции
+            //pull.rollback();
+            throw new PersistException(e);
+        }
+
+        return true;
+
+    }
+
     /**
      * Возвращает объект из entryMap или создает новый по переданному ключу (id значению)
      * @param clazz
@@ -210,17 +281,17 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
     private <T, PK> Entry<T, PK> getObjectByKey(Class<T> clazz, PK key) throws PersistException {
 
 
-        Optional<Entry<T, PK>> entryOpt = getEntryByObjKey(clazz, key);
-
-        if (entryOpt.isPresent()) {
-            return entryOpt.get();
-        }else {
+//        Optional<Entry<T, PK>> entryOpt = getEntryByObjKey(clazz, key);
+//
+//        if (entryOpt.isPresent()) {
+//            return entryOpt.get();
+//        }else {
             try {
-                return createAndPutEntry(clazz, clazz.getConstructor().newInstance(), key);
+                return createAndGetEntry(clazz, clazz.getConstructor().newInstance(), key);
             } catch (Exception e) {
                 throw new PersistException(e);
             }
-        }
+//        }
     }
 
     /**
@@ -253,14 +324,30 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             }
         }
         if (str.isEmpty()) {
-            throw new PersistException("No field is annotated as Id in Group class.");
+            throw new PersistException("No field is annotated as @Id.");
+        }
+        return str;
+    }
+
+    private <T> String getVersionSQLName(Class<T> clazz) throws PersistException {
+        String str = "";
+
+        if (clazz.isAnnotationPresent(VersionControl.class)) {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (field.isAnnotationPresent(Version.class)) {
+                    str = field.getAnnotation(Column.class).name();
+                }
+            }
+            if (str.isEmpty()) {
+                throw new PersistException("No field is annotated as @Version.");
+            }
         }
         return str;
     }
 
     private String getSqlFieldName(Field field) throws PersistException {
 
-        String fieldName = null;
+        String fieldName;
 
         if (field.isAnnotationPresent(Column.class)) {
             fieldName = field.getAnnotation(Column.class).name();
@@ -384,6 +471,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                 if (!field.isAnnotationPresent(JoinColumn.class)) {
                     throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne fiaeld");
                 }
+                str.append(field.getAnnotation(JoinColumn.class).name());
                 str.append(" = ?");
                 str.append(",");
             }
@@ -451,7 +539,16 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
         return sql.toString();
     }
 
-    private <PK> void setIdToStatement(PK key, PreparedStatement statement, int incr) throws PersistException {
+
+    /**
+     * Устанавливает ID ссылки вторичного ключа в переданный statement на указанную позицию.
+     * @param key
+     * @param statement
+     * @param incr
+     * @param <PK>
+     * @throws PersistException
+     */
+    private <PK> void setPkIdToStatement(PK key, PreparedStatement statement, int incr) throws PersistException {
         @SuppressWarnings("unchecked")
         Class<PK> clazz = (Class<PK>) key.getClass();
         Field IdField = null;
@@ -494,7 +591,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                     if (!field.isAnnotationPresent(JoinColumn.class)) {
                         throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne field");
                     }
-                    statement.setObject(++i, Reflect.getGetterMethodByField(clazz, field).invoke(object));
+                    statement.setObject(++i, getId(Reflect.getGetterMethodByField(clazz, field).invoke(object)));
                 }
             }
             if (fieldId != null) {
@@ -559,14 +656,8 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                         throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne fiaeld");
                     }
 
-                    /*
-                    Получаем один из объектов модели, связанной вторичным ключем с переданным объктом.
-                    В БД необходимо передать только значение идентификатора этого объекта.
-                     */
-                    setIdToStatement(Reflect.getGetterMethodByField(clazz, field).invoke(object), statement, ++i);
-
+                    setPkIdToStatement(getId(object), statement, ++i);
                 }
-
             }
         } catch (Exception e) {
             throw new PersistException(e);
@@ -602,7 +693,6 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                 T object = entry.getObj();
 
                 if (entry.getStatus() == EntryStatus.ISNULL) {
-
 
                     entry.setStatus(EntryStatus.NEW);
 
@@ -696,6 +786,22 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
         }
     }
 
+    private <T> void setVersion(T object, Object ver) throws PersistException {
+        @SuppressWarnings("unchecked")
+        Class<T> clazz = (Class<T>) object.getClass();
+
+        try {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (field.isAnnotationPresent(Version.class)) {
+                    Method method = Reflect.getSetterMethodByField(clazz, field);
+                    method.invoke(object, ver);
+                }
+            }
+        } catch (Exception e) {
+            throw new PersistException(e);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private <T, PK> PK getId(T object) throws PersistException {
 
@@ -705,6 +811,24 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             if (field.isAnnotationPresent(Id.class)) {
                 try {
                     value = (PK) Reflect.getGetterMethodByField(object.getClass(), field).invoke(object);
+                    break;
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new PersistException(e);
+                }
+            }
+        }
+        return value;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> int getVersion(T object) throws PersistException {
+
+        int value = 0;
+
+        for (Field field : object.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(Version.class)) {
+                try {
+                    value = (int) Reflect.getGetterMethodByField(object.getClass(), field).invoke(object);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new PersistException(e);
                 }

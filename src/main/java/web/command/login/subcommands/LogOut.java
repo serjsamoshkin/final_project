@@ -1,5 +1,6 @@
 package web.command.login.subcommands;
 
+import util.wrappers.WrappedUser;
 import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
 import web.command.login.LogInCommand;
@@ -30,7 +31,7 @@ public class LogOut extends RootCommand {
 
         HttpSession session = request.getSession();
 
-        session.setAttribute("user", ServiceMapper.getMapper().getService(UserService.class).getWrappedDefUser());
+        session.setAttribute("user", WrappedUser.of());
 
         forward(Page.DEF, request, response);
 

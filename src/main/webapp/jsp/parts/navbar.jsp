@@ -20,7 +20,7 @@
                 <li class="nav-item ${init_active}">
                     <a class="nav-link" href="<c:url value="/"/>"><fmt:message key="home"/></a>
                 </li>
-                    <%--<c:if test="${user.isAuthorized == true}">--%>
+                    <%--<c:if test="${user.authenticated == true}">--%>
                         <li class="nav-item ${reception_active}">
                             <a class="nav-link" href="<c:url value="/reception/show_receptions"/>"><fmt:message key="my-receptions"/></a>
                         </li>
@@ -28,13 +28,13 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
 
-                <c:if test="${user.isAuthorized == false}">
+                <c:if test="${user.authenticated == false}">
                     <li class="nav-item ${registration_active}">
                         <a class="nav-link" href="<c:url value="/registration/show_registration_form"/>"><fmt:message key="register"/></a>
                     </li>
                 </c:if>
                 <c:choose>
-                    <c:when test="${user.isAuthorized == false}">
+                    <c:when test="${user.authenticated == false}">
                         <li class="nav-item ${login_active}">
                             <a class="nav-link" href="/login">
                                 </span><fmt:message key="login"/>

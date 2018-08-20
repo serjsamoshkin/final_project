@@ -2,6 +2,7 @@ package model.entity.authentication;
 import persistenceSystem.annotations.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Class for presenting authenticated users in application.
@@ -33,7 +34,9 @@ public class User {
 
     //TODO При создании нового пользователя список пуст, нужно переделать запись таблиц вторичных ключей через внутренний сеттер.
     @OneToMany(mappedBy = "user")
-    private List<UsersRole> usersRoles;
+    private List<UsersRole> usersRoles = new ArrayList<>();
+
+    private volatile Set<Role> roles;
 
     public User() {
     }
@@ -79,18 +82,13 @@ public class User {
     }
 
     public Set<Role> getRoles() {
-
-        // TODO загрушка пока не сделаю механизм актуализации по вторичной связе.
-        if (usersRoles == null) {
-            usersRoles = new ArrayList<>();
+        if (roles == null){
+            synchronized (this){
+                if (roles == null) {
+                    roles = usersRoles.stream().map(UsersRole::getRole).collect(Collectors.toSet());
+                }
+            }
         }
-
-        Set<Role> roles = new HashSet<>();
-        for (UsersRole usersRole :
-                usersRoles) {
-            roles.add(usersRole.getRole());
-        }
-
         return roles;
     }
 

@@ -1,5 +1,6 @@
 package web.command.reception.subcommands;
 
+import util.wrappers.WrappedUser;
 import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
 import web.command.reception.ReceptionCommand;
@@ -51,8 +52,7 @@ public class ConfirmReservationCommand extends RootCommand {
             }else {
 
                 boolean done = ServiceMapper.getMapper().getService(ReceptionService.class).confirmReservation(dto,
-                        // TODO заменить на ДТО или другой враппер
-                        (User) ((Map<String, Object>)request.getSession().getAttribute("user")).get("obj"));
+                        WrappedUser.userOf(request.getSession().getAttribute("user")));
 
                 if (done) {
                     forward("/jsp/reception/reservation_done.jsp", request, response);

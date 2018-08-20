@@ -137,7 +137,7 @@ public class UserService extends AbstractService{
             Optional<User> user = userDao.getByEmail(email, connection);
             if (user.isPresent()) {
                 if (BCrypt.checkpw(password + SALT, user.get().getPasswordHash())) {
-                    findUser = Optional.of(user.get());
+                    findUser = user;
                 }
             }
         }
@@ -146,37 +146,6 @@ public class UserService extends AbstractService{
         }
 
         return findUser;
-    }
-
-
-    public List<Map<String, Object>> getWrappedUserList(int page) throws PersistException{
-
-        // TODO пэджинация
-
-        DataSource ds = getDataSource();
-        UserDAO userDao = DaoMapper.getMapper().getDao(UserDAO.class);
-
-        List<User> users;
-
-        try (Connection connection = ds.getConnection()){
-            users = userDao.getALL(connection);
-        }catch (SQLException e){
-            throw new PersistException(e);
-        }
-
-        List<Map<String, Object>> userList = new ArrayList<>();
-
-        for (User user :
-                users) {
-            userList.add(getWrappedUser(user));
-        }
-
-        return userList;
-
-    }
-
-    public Map<String, Object> getWrappedDefUser(){
-        return getWrappedUser(User.NOT_AUTHENTICATED);
     }
 
     /**
@@ -199,7 +168,7 @@ public class UserService extends AbstractService{
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("obj", user);
 
-        userMap.put("isAuthorized", user != User.NOT_AUTHENTICATED);
+        userMap.put("authorized", user != User.NOT_AUTHENTICATED);
         userMap.put("isAdmin", user.getRoles().contains(admin));
         userMap.put("isMaster", user.getRoles().contains(master));
         userMap.put("name", user.getName());
@@ -233,5 +202,7 @@ public class UserService extends AbstractService{
 
         return user;
     }
+
+
 
 }

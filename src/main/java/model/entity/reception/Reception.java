@@ -7,7 +7,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.Objects;
 
-
+@VersionControl
 @TableName(name = "receptions")
 public class Reception{
 
@@ -22,6 +22,9 @@ public class Reception{
     private java.sql.Time time;
     @Column(name = "reception_end_time")
     private java.sql.Time endTime;
+    @Version
+    @Column(name = "reception_version")
+    private int version;
 
     @OneToOne
     @JoinColumn(name = "services_service_id")
@@ -91,7 +94,13 @@ public class Reception{
         this.user = user;
     }
 
+    public int getVersion() {
+        return version;
+    }
 
+    public void setVersion(int version) {
+        this.version = version;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -1,5 +1,6 @@
 package web.command.registration.subcommands;
 
+import util.wrappers.WrappedUser;
 import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
 import web.command.registration.RegistrationCommand;
@@ -37,11 +38,10 @@ public class RegisterCommand extends RootCommand {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        UserService userService = ServiceMapper.getMapper().getService(UserService.class);
-
         User user;
         try{
-            user = userService.createUser(name, email, password);
+            user = ServiceMapper.getMapper().getService(UserService.class)
+                    .createUser(name, email, password);
         }catch (RowNotUniqueException e){
 
             // TODO Перенаправить на ту же страницу
@@ -59,7 +59,7 @@ public class RegisterCommand extends RootCommand {
             return;
         }
 
-        session.setAttribute("user", userService.getWrappedUser(user));
+        session.setAttribute("user", WrappedUser.of(user));
 
         forward(Page.DEF, request, response);
 
