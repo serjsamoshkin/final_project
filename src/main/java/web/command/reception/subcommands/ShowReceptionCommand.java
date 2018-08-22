@@ -6,7 +6,7 @@ import web.command.reception.ReceptionCommand;
 import model.service.ServiceMapper;
 import util.dto.reception.ShowReception.ShowReceptionInDto;
 import util.dto.reception.ShowReception.ShowReceptionOutDto;
-import model.service.reception.ReceptionService;
+import model.service.reception.ShowReceptionService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -35,7 +35,7 @@ public class ShowReceptionCommand extends RootCommand {
             builder.setService(request.getParameter("filter_service_opt"));
         }
 
-        ShowReceptionOutDto dto = ServiceMapper.getMapper().getService(ReceptionService.class).processShowReceptionRequest(builder.build());
+        ShowReceptionOutDto dto = ServiceMapper.getMapper().getService(ShowReceptionService.class).processShowReceptionRequest(builder.build());
 
         if (dto.isOk()) {
             request.setAttribute("masters_schedule", dto.getMastersSchedule());

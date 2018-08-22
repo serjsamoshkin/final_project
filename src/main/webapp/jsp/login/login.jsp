@@ -14,17 +14,17 @@
             <div class="form-group">
                 <label for="email"><fmt:message key="email"/>:</label>
                 <input type="email" name="email" id="email" class="form-control" value="${email_r}">
-                <div class="has-error">
-                    <p class="help-block" name="incorrect_email" id="incorrect_email">
-                    <c:if test="${user_not_found == true}">
-                        <fmt:message key="userNotFound"/>
-                    </c:if>
-                    </p>
-                </div>
             </div>
             <div class="form-group">
                 <label for="password"><fmt:message key="password"/>:</label>
                 <input type="password" name="password" id="password" class="form-control">
+                <div class="has-error">
+                    <p class="help-block" name="incorrect_email" id="incorrect_email">
+                        <c:if test="${user_not_found == true}">
+                            <fmt:message key="userNotFound"/>
+                        </c:if>
+                    </p>
+                </div>
             </div>
             <button type="submit" class="btn btn-primary"><fmt:message key="login"/></button>
         </form>

@@ -1,6 +1,9 @@
-package model.entity.reception;
+package util.wrappers;
 
 import model.entity.authentication.User;
+import model.entity.reception.Master;
+import model.entity.reception.Reception;
+import model.entity.reception.Service;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -32,6 +35,9 @@ public class ImmutableReception {
     }
 
     public static ImmutableReception of(Reception reception){
+        if (reception == null){
+            return null;
+        }
 
         return new ImmutableReception(reception, reception.getId(), reception.getDay(), reception.getTime(), reception.getEndTime(),
                 reception.getVersion(), reception.getService(), reception.getMaster(), reception.getUser());

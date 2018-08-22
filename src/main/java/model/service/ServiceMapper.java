@@ -8,15 +8,13 @@ public class ServiceMapper {
 
     private static ServiceMapper mapper;
 
-    private final ServletContext context;
     private final DataSource dataSource;
 
     private ConcurrentHashMap<Class<? extends AbstractService>, AbstractService> services;{
         services = new ConcurrentHashMap<>();
     }
 
-    private ServiceMapper(ServletContext context, DataSource dataSource) {
-        this.context = context;
+    private ServiceMapper(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -26,16 +24,15 @@ public class ServiceMapper {
      * Singleton. Method builds ServiceMapper with ServletContext and DataSource parameters.
      * Use the getMapper() method to obtain an instance of ServiceMapper
      *
-     * @param context stored in class variable
      * @param dataSource stored in class variable
      */
-    public static void buildMapper(ServletContext context, DataSource dataSource){
+    public static void buildMapper(DataSource dataSource){
         ServiceMapper localInstance = mapper;
         if (localInstance == null) {
             synchronized (ServiceMapper.class) {
                 localInstance = mapper;
                 if (localInstance == null) {
-                    mapper = new ServiceMapper(context, dataSource);
+                    mapper = new ServiceMapper( dataSource);
                 }
             }
         }
@@ -62,7 +59,7 @@ public class ServiceMapper {
                 service = services.get(clazz);
                 if (service == null){
                     try {
-                        service = clazz.getConstructor(ServletContext.class, DataSource.class).newInstance(context, dataSource);
+                        service = clazz.getConstructor(DataSource.class).newInstance(dataSource);
                         services.put(clazz, service);
                     }catch (ReflectiveOperationException e){
                         throw new RuntimeException(e);

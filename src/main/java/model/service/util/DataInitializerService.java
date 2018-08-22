@@ -1,4 +1,4 @@
-package model.service.initializer;
+package model.service.util;
 
 import model.dao.DaoMapper;
 import model.dao.reception.MasterDAO;
@@ -7,6 +7,7 @@ import model.dao.reception.ServiceDAO;
 import model.entity.reception.Master;
 import model.entity.reception.MastersService;
 import model.entity.reception.Service;
+import model.service.authentication.RoleService;
 import persistenceSystem.RowNotUniqueException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,8 +24,8 @@ public class DataInitializerService extends AbstractService{
 
     private static final Logger logger = LogManager.getLogger(DataInitializerService.class);
 
-    public DataInitializerService(ServletContext context, DataSource dataSource) {
-        super(context, dataSource);
+    public DataInitializerService(DataSource dataSource) {
+        super(dataSource);
     }
 
     public void initIfNeed(){
@@ -40,21 +41,21 @@ public class DataInitializerService extends AbstractService{
             con.setAutoCommit(false);
 
             Master master1 = new Master();
-            master1.setUser(userService.createUser("Иваненко", "ivanenko@me.me", "1"));
+            master1.setUser(userService.createUser("Иваненко", "ivanenko@me.me", "1", ServiceMapper.getMapper().getService(RoleService.class).getRoleMaster()));
             master1.setName("Анна");
             master1.setSurname("Иваненко");
 
             masterDAO.save(master1, con);
 
             Master master2 = new Master();
-            master2.setUser(userService.createUser("Петренко", "petrenko@me.me", "1"));
+            master2.setUser(userService.createUser("Петренко", "petrenko@me.me", "1", ServiceMapper.getMapper().getService(RoleService.class).getRoleMaster()));
             master2.setName("Инна");
             master2.setSurname("Петренко");
 
             masterDAO.save(master2, con);
 
             Master master3 = new Master();
-            master3.setUser(userService.createUser("Сидоренко", "sidorenko@me.me", "1"));
+            master3.setUser(userService.createUser("Сидоренко", "sidorenko@me.me", "1", ServiceMapper.getMapper().getService(RoleService.class).getRoleMaster()));
             master3.setName("Дарья");
             master3.setSurname("Сидоренко");
 

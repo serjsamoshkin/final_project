@@ -6,6 +6,9 @@ import org.apache.logging.log4j.Logger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class TimePlanning {
@@ -43,4 +46,16 @@ public class TimePlanning {
     public static int getTimeModulator() {
         return timeModulator;
     }
+
+    public static List<LocalTime> getDailyScheme(LocalDate date){
+
+        List<LocalTime> scheme = new ArrayList<>();
+        for (int i = 0; i < TimePlanning.betweenDuration(TimePlanning.startOfDay(date), TimePlanning.endOfDay(date)); i++) {
+            scheme.add(TimePlanning.plusDuration(TimePlanning.startOfDay(date), i));
+        }
+
+        return scheme;
+    }
+
+
 }

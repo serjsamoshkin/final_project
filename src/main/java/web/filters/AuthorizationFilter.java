@@ -41,11 +41,13 @@ public class AuthorizationFilter implements Filter {
                     if (wrappedUser.isMaster()) {
                         isAuthorized = true;
                     }
+                    break;
                 }
                 case "/review": {
                     if (wrappedUser.isUser()) {
                         isAuthorized = true;
                     }
+                    break;
                 }
             }
         }
@@ -53,7 +55,11 @@ public class AuthorizationFilter implements Filter {
         if (isAuthorized){
             next.doFilter(request, response);
         }else {
-            httpResponse.sendRedirect("./error404.jsp");
+            if (wrappedUser.isAuthenticated()) {
+                httpResponse.sendRedirect("./error404.jsp");
+            }else {
+                // TODO кинуть на страничку логироваия, передать изанчальный адрес запроса.
+            }
         }
 
 

@@ -14,7 +14,8 @@ import java.io.IOException;
 
 
 @WebServlet(name = "MainServlet",
-        urlPatterns = {"/init", "/registration/*", "/reception/*", "/login/*", "/set_locale/*", "/administrator/*"})
+        urlPatterns = {"/init", "/registration/*", "/reception/*", "/login/*",
+                "/set_locale/*", "/administrator/*", "/master/*"})
 public class MainServlet extends HttpServlet {
 
     private static final Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);

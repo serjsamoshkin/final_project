@@ -2,7 +2,7 @@ package model.dao.model;
 
 import model.dao.DaoMapper;
 import model.dao.reception.ReceptionDAO;
-import model.entity.reception.ImmutableReception;
+import util.wrappers.ImmutableReception;
 import model.entity.reception.Reception;
 import org.junit.After;
 import org.junit.Before;

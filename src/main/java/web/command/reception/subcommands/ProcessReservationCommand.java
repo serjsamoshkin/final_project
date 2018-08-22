@@ -1,12 +1,12 @@
 package web.command.reception.subcommands;
 
+import model.service.reception.ReservationService;
 import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
 import web.command.reception.ReceptionCommand;
 import model.service.ServiceMapper;
 import util.dto.reception.ProcessReservation.ProcessReceptionInDto;
 import util.dto.reception.ProcessReservation.ProcessReceptionOutDto;
-import model.service.reception.ReceptionService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -41,7 +41,7 @@ public class ProcessReservationCommand extends RootCommand {
             builder.setService(request.getParameter("filter_service_opt"));
         }
 
-        ProcessReceptionOutDto dto = ServiceMapper.getMapper().getService(ReceptionService.class).processReservationRequest(builder.build());
+        ProcessReceptionOutDto dto = ServiceMapper.getMapper().getService(ReservationService.class).processReservationRequest(builder.build());
 
         if (dto.isOk()) {
             if (dto.isReserved()){
@@ -59,7 +59,7 @@ public class ProcessReservationCommand extends RootCommand {
                 forward("/jsp/reception/reservation.jsp", request, response);
             }
         }else {
-            forward(Page.PAGE_500, request, response);
+            forward(Page.DEF, request, response);
         }
 
     }

@@ -30,8 +30,8 @@ public class UserService extends AbstractService{
      */
     private static final String SALT = "*jjd*71Ujd";
 
-    public UserService(ServletContext context, DataSource dataSource) {
-        super(context, dataSource);
+    public UserService(DataSource dataSource) {
+        super(dataSource);
 
         try(Connection connection = getDataSource().getConnection()) {
             if (!DaoMapper.getMapper().getDao(UserDAO.class).getByEmail("admin@me.me", connection).isPresent()){
@@ -148,48 +148,7 @@ public class UserService extends AbstractService{
         return findUser;
     }
 
-    /**
-     * Method adds user's public fields to Map key and adds additional keys like isAdmin to be read in jsp page
-     *  Also method wraps {@code User} object in "obj" key of returning Map.
-     *
-     * Returning Map is served to set view in JSP with EL and JSTL-tags functions.
-     *
-     * @param user to wrap
-     * @return {@code HashMap<String, Object>}
-     */
-    public Map<String, Object> getWrappedUser(User user){
 
-        RoleService roleService = ServiceMapper.getMapper().getService(RoleService.class);
-
-        Role admin = roleService.getRoleAdministrator();
-        Role master = ServiceMapper.getMapper().getService(RoleService.class).getRoleMaster();
-
-
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("obj", user);
-
-        userMap.put("authorized", user != User.NOT_AUTHENTICATED);
-        userMap.put("isAdmin", user.getRoles().contains(admin));
-        userMap.put("isMaster", user.getRoles().contains(master));
-        userMap.put("name", user.getName());
-        userMap.put("email", user.getEmail());
-
-        Set<Role> roles = user.getRoles();
-        userMap.put("rolesList", roles);
-        StringBuilder str = new StringBuilder();
-        for (Role role:
-             roles) {
-            str.append(role.getName());
-            str.append("/");
-        }
-        if (str.length() > 0) {
-            str.deleteCharAt(str.length() - 1);
-        }
-        userMap.put("rolesStr", str.toString());
-
-        return userMap;
-
-    }
 
     public Optional<User> getUserByEmail(String email) {
 

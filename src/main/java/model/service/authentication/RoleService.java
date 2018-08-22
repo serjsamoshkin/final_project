@@ -21,8 +21,8 @@ public class RoleService extends AbstractService{
     private final Role master;
     private final Role user;
 
-    public RoleService(ServletContext context, DataSource dataSource) {
-        super(context, dataSource);
+    public RoleService(DataSource dataSource) {
+        super(dataSource);
 
         try (Connection connection = dataSource.getConnection()) {
             administrator = DaoMapper.getMapper().getDao(RoleDAO.class).getByName("Administrator", connection).orElseGet(() -> createRole("Administrator"));
@@ -57,7 +57,7 @@ public class RoleService extends AbstractService{
         return Role.EMPTY_ROLE;
     }
 
-    public Role createRole(String roleName) throws PersistException{
+    private Role createRole(String roleName) throws PersistException{
 
         try( Connection connection = getDataSource().getConnection()) {
             Role role = new Role();

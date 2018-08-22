@@ -32,6 +32,12 @@ public class ConfirmLogInCommand extends RootCommand {
     public void executeCommand(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String email = request.getParameter("email");
+
+        if (email == null){
+            response.sendRedirect("./");
+            return;
+        }
+
         String password = request.getParameter("password");
         UserService service = ServiceMapper.getMapper().getService(UserService.class);
 

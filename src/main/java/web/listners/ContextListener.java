@@ -67,7 +67,7 @@ public class ContextListener implements ServletContextListener{
             con.close();
 
             /*Run after DaoMapper*/
-            ServiceMapper.buildMapper(context, ds);
+            ServiceMapper.buildMapper(ds);
 
         } catch (NamingException e) {
             logger.error("InitialContext error: db init, jdbc/beauty_saloon", e);

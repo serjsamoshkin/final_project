@@ -1,21 +1,21 @@
 package web.command.reception.subcommands;
 
+import model.service.reception.ConfirmReservationService;
+import model.service.reception.ReservationService;
 import util.wrappers.WrappedUser;
 import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
 import web.command.reception.ReceptionCommand;
-import model.entity.authentication.User;
 import model.service.ServiceMapper;
 import util.dto.reception.ProcessReservation.ProcessReceptionInDto;
 import util.dto.reception.ProcessReservation.ProcessReceptionOutDto;
-import model.service.reception.ReceptionService;
+import model.service.reception.ShowReceptionService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 
 @WebCommand(urlPattern = "/confirm_reservation",
@@ -44,14 +44,14 @@ public class ConfirmReservationCommand extends RootCommand {
             builder.setService(request.getParameter("filter_service_opt"));
         }
 
-        ProcessReceptionOutDto dto = ServiceMapper.getMapper().getService(ReceptionService.class).processReservationRequest(builder.build());
+        ProcessReceptionOutDto dto = ServiceMapper.getMapper().getService(ReservationService.class).processReservationRequest(builder.build());
 
         if (dto.isOk()) {
             if (dto.isReserved()){
                 forward("/jsp/reception/reservation_failed.jsp", request, response);
             }else {
 
-                boolean done = ServiceMapper.getMapper().getService(ReceptionService.class).confirmReservation(dto,
+                boolean done = ServiceMapper.getMapper().getService(ConfirmReservationService.class).confirmReservation(dto,
                         WrappedUser.userOf(request.getSession().getAttribute("user")));
 
                 if (done) {

@@ -6,7 +6,7 @@ import web.command.admin.AdminCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import model.service.ServiceMapper;
-import model.service.initializer.DataInitializerService;
+import model.service.util.DataInitializerService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

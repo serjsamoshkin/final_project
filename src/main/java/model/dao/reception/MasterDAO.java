@@ -1,6 +1,7 @@
 package model.dao.reception;
 
 import model.dao.GenericDAO;
+import model.entity.authentication.User;
 import model.entity.reception.Master;
 import model.entity.reception.MastersService;
 import model.entity.reception.Service;
@@ -87,6 +88,33 @@ public class MasterDAO implements GenericDAO<Master, Integer> {
 
         return list;
 
+    }
+
+    public Master getMasterByUserId(int userId, Connection connection){
+        CriteriaBuilder<Master> criteriaBuilder = controller.getCriteriaBuilder(Master.class);
+        PredicateBuilder<Master> predicateBuilder = criteriaBuilder.getPredicateBuilder(Master.class);
+
+        /*
+        Generates query like:
+        SELECT
+            *
+        FROM
+            beauty_saloon.masters
+        WHERE
+            users_user_id = '1';
+         */
+
+        criteriaBuilder = criteriaBuilder.And(
+                predicateBuilder.equal("user", userId)
+        );
+
+        List<Master> list = controller.getByCriteria(Master.class, criteriaBuilder, connection);
+
+        if (list.isEmpty()){
+            return null;
+        }
+
+        return list.get(0);
     }
 
 }

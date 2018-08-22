@@ -18,7 +18,7 @@ public class LocalDateTimeFormatter {
     }
 
     public static String toString(java.sql.Time time){
-        return DATE_FORMATTER.format(time.toLocalTime());
+        return TIME_FORMATTER.format(time.toLocalTime());
     }
 
     public static String toString(LocalTime time){
