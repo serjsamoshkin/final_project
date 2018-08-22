@@ -2,6 +2,7 @@ package persistenceSystem;
 
 import persistenceSystem.criteria.CriteriaBuilder;
 
+import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,33 +15,46 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class JDBCDaoController {
 
     /**
-     * {@code value} of the map is {@code Map<Object, Entry>},  where Object is an persistence object - model.entity.
-     * The pair of the inner (value) map is stored in the WeakHashMap.
-     * So, for example, if the user's session is ended and {@code User} has been unloaded from the session attributes,
-     * the garbage collector can process the object ({@code User} in this example) and its Entry pair.
+     * Double binding WeekHashMap. controlMap contains WeakReference on Entity object and locks clearing in
+     * {@code Map<Entry, WeakReference<Entry>>} (that is value of entryMap). Entry contains WeakReference on
+     *  Entity object, thus gc can clear all values in chain of week object -> entry (-> week object) -> week entry -> week entry
+     *  when reference on Entity object will be cleared.
+     *
      */
-    private static Map<Class, Map<Object, Entry>> entryMap;
+    private static Map<Class, Map<Entry, WeakReference<Entry>>> entryMap;
+    private static Map<Object, Entry> controlMap;
+
     static {
         entryMap = new ConcurrentHashMap<>();
+        controlMap = new WeakHashMap<>();
     }
+
 
     @SuppressWarnings("unchecked")
     protected final <T, PK> Optional<Entry<T, PK>> getEntryByPK(final Class<T> clazz, PK key) {
-        entryMap.putIfAbsent(clazz, new WeakHashMap<>());
-        synchronized (clazz) {
-            return Optional.ofNullable(entryMap.get(clazz).values().stream().filter(e -> e.getKey().equals(key)).findFirst().orElse(null));
-        }
+        entryMap.putIfAbsent(clazz, Collections.synchronizedMap(new WeakHashMap<>()));
+
+        return Optional.ofNullable(entryMap.get(clazz).get(Entry.forSearch(key, clazz)).get());
+//        synchronized (clazz) {
+//            return Optional.ofNullable(entryMap.get(clazz).values().stream().filter(e -> e.getKey().equals(key)).findFirst().orElse(null));
+//        }
     }
 
     @SuppressWarnings("unchecked")
     protected final <T, PK> Entry<T, PK> createAndGetEntry(final Class<T> clazz, T obj, PK key) {
-        entryMap.putIfAbsent(clazz, new WeakHashMap<>());
+        entryMap.putIfAbsent(clazz, Collections.synchronizedMap(new WeakHashMap<>()));
 
-        Map<Object, Entry> valMap = entryMap.merge(clazz, Map.of(), (o, n) -> {
-            o.put(obj, o.values().stream().filter(e -> e.getKey().equals(key)).findFirst().orElse(new Entry<>(obj, key)));
-            return o;
-        });
-        return valMap.get(obj);
+        Entry entry = new Entry<>(obj, key, clazz);
+        entryMap.get(clazz).putIfAbsent(entry, new WeakReference<>(entry));
+        entry = entryMap.get(clazz).get(entry).get();
+        controlMap.putIfAbsent(entry.getObj(), entry);
+
+//        Map<Object, Entry> valMap = entryMap.merge(clazz, Map.of(), (o, n) -> {
+//            o.put(obj, o.values().stream().filter(e -> e.getKey().equals(key)).findFirst().orElse(new Entry<>(obj, key)));
+//            return o;
+//        });
+//        return valMap.get(obj);
+        return entry;
     }
 
 
