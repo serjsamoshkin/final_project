@@ -103,7 +103,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
 
         String version = getVersionSQLName(clazz);
         if (!version.isEmpty()){
-            version += ", ";
+            version = ", " + version;
         }
 
         StringBuilder str = new StringBuilder(" SELECT ")
@@ -278,7 +278,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
      * @return
      * @throws PersistException
      */
-    private <T, PK> Entry<T, PK> getObjectByKey(Class<T> clazz, PK key) throws PersistException {
+    private <T, PK> Entry<T, PK> getObjectByKey(Class<T> clazz, T obj, PK key) throws PersistException {
 
 
 //        Optional<Entry<T, PK>> entryOpt = getEntryByObjKey(clazz, key);
@@ -287,7 +287,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
 //            return entryOpt.get();
 //        }else {
             try {
-                return createAndGetEntry(clazz, clazz.getConstructor().newInstance(), key);
+                return createAndGetEntry(clazz, obj, key);
             } catch (Exception e) {
                 throw new PersistException(e);
             }
@@ -653,10 +653,10 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                     statement.setObject(++i, Reflect.getGetterMethodByField(clazz, field).invoke(object));
                 } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
                     if (!field.isAnnotationPresent(JoinColumn.class)) {
-                        throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne fiaeld");
+                        throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne field");
                     }
 
-                    setPkIdToStatement(getId(object), statement, ++i);
+                    setPkIdToStatement(Reflect.getGetterMethodByField(clazz, field).invoke(object), statement, ++i);
                 }
             }
         } catch (Exception e) {
@@ -685,12 +685,14 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                     throw new PersistException("No ID field in class: " + clazz);
                 }
 
-                Object key =  rs.getObject(idField.getAnnotation(Column.class).name());
+                Object key = rs.getObject(idField.getAnnotation(Column.class).name());
 //                T object = getObjectByKey(clazz, key);
 
-                Entry<T, ?> entry = getObjectByKey(clazz, key);
+                T object = clazz.getConstructor().newInstance();
+
+                Entry<T, ?> entry = getObjectByKey(clazz, object, key);
 //                Entry<T, ?> entry = getEntryByObjKey(clazz, key).orElseThrow(() -> new PersistException("No Entry!"));
-                T object = entry.getObj();
+                object = entry.getObj();
 
                 if (entry.getStatus() == EntryStatus.ISNULL) {
 

@@ -34,7 +34,7 @@ public abstract class JDBCDaoController {
     protected final <T, PK> Optional<Entry<T, PK>> getEntryByPK(final Class<T> clazz, PK key) {
         entryMap.putIfAbsent(clazz, Collections.synchronizedMap(new WeakHashMap<>()));
 
-        return Optional.ofNullable(entryMap.get(clazz).get(Entry.forSearch(key, clazz)).get());
+        return Optional.ofNullable(entryMap.get(clazz).getOrDefault(Entry.forSearch(key, clazz), new WeakReference<>(null)).get());
 //        synchronized (clazz) {
 //            return Optional.ofNullable(entryMap.get(clazz).values().stream().filter(e -> e.getKey().equals(key)).findFirst().orElse(null));
 //        }
@@ -47,7 +47,13 @@ public abstract class JDBCDaoController {
         Entry entry = new Entry<>(obj, key, clazz);
         entryMap.get(clazz).putIfAbsent(entry, new WeakReference<>(entry));
         entry = entryMap.get(clazz).get(entry).get();
-        controlMap.putIfAbsent(entry.getObj(), entry);
+        if (entry.getObj() == null){
+            synchronized (clazz){
+                entry = new Entry<>(obj, key, clazz);
+                entryMap.get(clazz).put(entry, new WeakReference<>(entry));
+                controlMap.putIfAbsent(obj, entry);
+            }
+        }
 
 //        Map<Object, Entry> valMap = entryMap.merge(clazz, Map.of(), (o, n) -> {
 //            o.put(obj, o.values().stream().filter(e -> e.getKey().equals(key)).findFirst().orElse(new Entry<>(obj, key)));
