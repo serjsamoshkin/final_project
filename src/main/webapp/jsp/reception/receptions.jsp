@@ -81,7 +81,7 @@
 
             <div class="col-lg-3 col-md-6 col-xs-12">
                     ${master.key.name}
-                <table class="table table-striped">
+                <table class="table table-hover">
                     <tr>
                         <th><fmt:message key="reception-time"/></th>
                         <th></th>

@@ -18,7 +18,7 @@ public class ShowReceptionOutDto extends AbstractDto {
     private final int hours;
     private final int minutes;
 
-    public ShowReceptionOutDto(boolean ok, Map<Master, Map<String, Boolean>> mastersSchedule, Map<Service, Boolean> serviceMap, String reservationDay, String nextDay, String previousDay, int hours, int minutes) {
+    private ShowReceptionOutDto(boolean ok, Map<Master, Map<String, Boolean>> mastersSchedule, Map<Service, Boolean> serviceMap, String reservationDay, String nextDay, String previousDay, int hours, int minutes) {
         super(ok);
         this.mastersSchedule = mastersSchedule;
         this.serviceMap = serviceMap;

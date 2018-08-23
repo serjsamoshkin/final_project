@@ -63,6 +63,10 @@ public abstract class JDBCDaoController {
         return entry;
     }
 
+    protected final <T, PK> void clearEntry(final Class<T> clazz, PK key){
+        entryMap.get(clazz).remove(Entry.forSearch(key, clazz));
+    }
+
 
     /**
      * returns an object by PrivetKey - a field with @Id annotation is used to get the name of the SQL-table

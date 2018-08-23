@@ -1,6 +1,7 @@
 package model.dao.reception;
 
 import model.dao.GenericDAO;
+
 import model.entity.reception.Master;
 import model.entity.reception.Reception;
 import model.entity.reception.Service;
@@ -12,14 +13,11 @@ import persistenceSystem.criteria.predicates.PredicateBuilder;
 import util.datetime.LocalDateTimeFormatter;
 import util.datetime.TimePlanning;
 
-import javax.servlet.ServletResponse;
+
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +35,7 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
     public ReceptionDAO(JDBCDaoController controller) {
         this.controller = controller;
     }
+
 
     @Override
     public Reception getByPK(Integer key, Connection connection) throws PersistException {
@@ -61,6 +60,21 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
     @Override
     public void save(Reception object, Connection connection) throws PersistException, RowNotUniqueException {
         controller.save(object, connection);
+    }
+
+    public synchronized void safeUpdate(Reception object, Reception.Status status, int version, Connection connection) throws ConcurrentModificationException {
+        if (object.getId() == 0) {
+            throw new IllegalArgumentException("Reception not persisted");
+        }
+        if (status == null) {
+            throw new NullPointerException("Status is null");
+        }
+
+        Reception copy = Reception.of(object);
+        copy.setStatus(status);
+        copy.setVersion(version);
+
+        update(copy, connection);
     }
 
     public List<Reception> getMastersReceptions(LocalDate date, List<Master> masterList, Connection connection) {
@@ -122,6 +136,7 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
         return !list.isEmpty();
 
     }
+
     public Set<Service> getServiceListForTimeAndMaster(LocalDate date, LocalTime time, Master master, Connection connection) {
 
         /*
@@ -170,7 +185,6 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
         return new HashSet<>(list);
 
     }
-
 
 
 }

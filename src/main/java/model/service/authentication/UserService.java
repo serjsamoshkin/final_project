@@ -56,6 +56,7 @@ public class UserService extends AbstractService{
     public User createUser(String name,
                            String email,
                            String password,
+                           Role firstRole,
                            Role... roles) throws PersistException, RowNotUniqueException {
 
 
@@ -65,27 +66,23 @@ public class UserService extends AbstractService{
             UserDAO userDao = DaoMapper.getMapper().getDao(UserDAO.class);
             UserRoleDAO userRoleDao = DaoMapper.getMapper().getDao(UserRoleDAO.class);
 
-            Role roleUser = ServiceMapper.getMapper().getService(RoleService.class).getRoleUser();
-
-            // TODO передалать все на билдеры
             user = new User();
             user.setName(name);
             user.setEmail(email);
 
             user.setPasswordHash(BCrypt.hashpw(password + SALT, BCrypt.gensalt()));
 
-            UsersRole usersRole = new UsersRole();
-            usersRole.setUser(user);
-            usersRole.setRole(roleUser);
+            List<Role> roleList = new ArrayList<>();
+            roleList.add(firstRole);
+            roleList.addAll(Arrays.asList(roles));
 
             try {
                 connection.setAutoCommit(false);
 
                 userDao.save(user, connection);
-                userRoleDao.save(usersRole, connection);
 
-                for (Role role : roles) {
-                    usersRole = new UsersRole();
+                for (Role role : roleList) {
+                    UsersRole usersRole = new UsersRole();
                     usersRole.setUser(user);
                     usersRole.setRole(role);
                     userRoleDao.save(usersRole, connection);
@@ -95,19 +92,10 @@ public class UserService extends AbstractService{
                 connection.setAutoCommit(true);
             }catch (SQLException e){
                 logger.error("Exception when creating a user", e);
+                connection.rollback();
                 throw new PersistException(e);
             }catch (RowNotUniqueException e){
-                try {
-                    userRoleDao.delete(usersRole, connection);
-                }catch (PersistException peEx){
-                    logger.error(peEx);
-                }
-                try {
-                    userDao.delete(user, connection);
-                }catch (PersistException peEx){
-                    logger.error(peEx);
-                }
-
+                connection.rollback();
                 throw e;
             }
 

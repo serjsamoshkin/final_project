@@ -21,12 +21,20 @@ public class LocalDateTimeFormatter {
         return TIME_FORMATTER.format(time.toLocalTime());
     }
 
+    public static String toString(java.sql.Date date){
+        return DATE_FORMATTER.format(date.toLocalDate());
+    }
+
     public static String toString(LocalTime time){
         return TIME_FORMATTER.format(time);
     }
 
     public static LocalDate toLocalDate(String date){
         return LocalDate.parse(date, DATE_FORMATTER);
+    }
+
+    public static LocalDate toLocalDate(java.sql.Date date){
+        return date.toLocalDate();
     }
 
     public static LocalTime toLocalTime(String time){

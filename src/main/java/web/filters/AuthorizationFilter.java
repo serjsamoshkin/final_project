@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {"/administrator/*", "/master/*", "/review/*"})
+@WebFilter(urlPatterns = {"/administrator/*", "/master/*", "/reception/*", "/review/*"})
 public class AuthorizationFilter implements Filter {
 
     private static final Logger logger = LogManager.getLogger(AuthorizationFilter.class);
@@ -49,6 +49,12 @@ public class AuthorizationFilter implements Filter {
                     }
                     break;
                 }
+                case "/reception": {
+                    if (wrappedUser.isUser()) {
+                        isAuthorized = true;
+                    }
+                    break;
+                }
             }
         }
 
@@ -59,6 +65,7 @@ public class AuthorizationFilter implements Filter {
                 httpResponse.sendRedirect("./error404.jsp");
             }else {
                 // TODO кинуть на страничку логироваия, передать изанчальный адрес запроса.
+                httpRequest.getServletContext().getRequestDispatcher("/login").forward(request, response);
             }
         }
 

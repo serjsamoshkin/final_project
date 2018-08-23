@@ -1,5 +1,6 @@
 package web.command.registration.subcommands;
 
+import model.service.authentication.RoleService;
 import util.wrappers.WrappedUser;
 import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
@@ -41,7 +42,8 @@ public class RegisterCommand extends RootCommand {
         User user;
         try{
             user = ServiceMapper.getMapper().getService(UserService.class)
-                    .createUser(name, email, password);
+                    .createUser(name, email, password,
+                            ServiceMapper.getMapper().getService(RoleService.class).getRoleUser());
         }catch (RowNotUniqueException e){
 
             // TODO Перенаправить на ту же страницу

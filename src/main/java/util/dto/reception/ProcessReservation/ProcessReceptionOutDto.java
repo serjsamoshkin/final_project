@@ -22,7 +22,7 @@ public class ProcessReceptionOutDto extends AbstractDto{
     private final int minutes;
     private final String endTime;
 
-    public ProcessReceptionOutDto(boolean ok, Map<Service, Boolean> serviceMap, Master master, Service service, String date, String time, boolean reserved, int hours, int minutes, String endTime) {
+    private ProcessReceptionOutDto(boolean ok, Map<Service, Boolean> serviceMap, Master master, Service service, String date, String time, boolean reserved, int hours, int minutes, String endTime) {
         super(ok);
         this.serviceMap = serviceMap;
         this.master = master;

@@ -20,14 +20,24 @@
                 <li class="nav-item ${init_active}">
                     <a class="nav-link" href="<c:url value="/"/>"><fmt:message key="home"/></a>
                 </li>
-                    <%--<c:if test="${user.authenticated == true}">--%>
+                    <c:if test="${user.authenticated == false or user.user == true}">
                         <li class="nav-item ${reception_active}">
-                            <a class="nav-link" href="<c:url value="/reception/show_receptions"/>"><fmt:message key="my-receptions"/></a>
+                            <a class="nav-link" href="<c:url value="/reception/show_receptions"/>"><fmt:message key="book-service"/></a>
                         </li>
-                    <%--</c:if>--%>
+                    </c:if>
             </ul>
             <ul class="nav navbar-nav navbar-right">
 
+                <c:if test="${user.authenticated == true}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="<c:url value="#"/>">${user.name}</a>
+                    </li>
+                </c:if>
+                <c:if test="${user.user == true}">
+                    <li class="nav-item ${reception_active}">
+                        <a class="nav-link" href="<c:url value="/reception/show_receptions"/>"><fmt:message key="my-receptions"/></a>
+                    </li>
+                </c:if>
                 <c:if test="${user.authenticated == false}">
                     <li class="nav-item ${registration_active}">
                         <a class="nav-link" href="<c:url value="/registration/show_registration_form"/>"><fmt:message key="register"/></a>

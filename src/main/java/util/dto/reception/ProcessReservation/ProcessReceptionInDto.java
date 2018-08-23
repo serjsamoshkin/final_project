@@ -12,7 +12,7 @@ public class ProcessReceptionInDto extends AbstractDto{
     private final String service;
     private final String master;
 
-    ProcessReceptionInDto(boolean ok, String day, String time, String service, String master) {
+    private ProcessReceptionInDto(boolean ok, String day, String time, String service, String master) {
         super(ok);
         this.day = day;
         this.time = time;

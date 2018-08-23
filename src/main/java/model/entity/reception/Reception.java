@@ -2,6 +2,7 @@ package model.entity.reception;
 
 import model.entity.authentication.User;
 import persistenceSystem.annotations.*;
+import persistenceSystem.annotations.EnumType;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -16,15 +17,15 @@ public class Reception{
     @Id
     @Column(name = "reception_id")
     private int id;
+    @Version
+    @Column(name = "reception_version")
+    private int version;
     @Column(name = "reception_day")
     private java.sql.Date day;
     @Column(name = "reception_time")
     private java.sql.Time time;
     @Column(name = "reception_end_time")
     private java.sql.Time endTime;
-    @Version
-    @Column(name = "reception_version")
-    private int version;
 
     @OneToOne
     @JoinColumn(name = "services_service_id")
@@ -37,6 +38,10 @@ public class Reception{
     @OneToOne
     @JoinColumn(name = "users_user_id")
     private User user;
+
+    @EnumType
+    @Column(name = "reception_status")
+    private Status status;
 
     public int getId() {
         return id;
@@ -102,6 +107,29 @@ public class Reception{
         this.version = version;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public static Reception of(Reception reception){
+        Reception copy = new Reception();
+        copy.setDay(reception.getDay());
+        copy.setEndTime(reception.getEndTime());
+        copy.setMaster(reception.getMaster());
+        copy.setService(reception.getService());
+        copy.setTime(reception.getTime());
+        copy.setUser(reception.getUser());
+        copy.setId(reception.getId());
+        copy.setStatus(reception.getStatus());
+        copy.setVersion(reception.getVersion());
+
+        return copy;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -127,5 +155,12 @@ public class Reception{
                 ", master=" + master +
                 ", user=" + user +
                 '}';
+    }
+
+    public enum Status{
+        NEW,
+        DONE,
+        CANCELED,
+        ;
     }
 }

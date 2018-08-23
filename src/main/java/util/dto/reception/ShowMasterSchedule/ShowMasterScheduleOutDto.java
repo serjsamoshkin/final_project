@@ -10,7 +10,7 @@ public class ShowMasterScheduleOutDto extends AbstractDto{
 
     private final Map<String, ReceptionView> schedule;
 
-    public ShowMasterScheduleOutDto(boolean ok, Map<String, ReceptionView> schedule) {
+    private ShowMasterScheduleOutDto(boolean ok, Map<String, ReceptionView> schedule) {
         super(ok);
         this.schedule = schedule;
     }

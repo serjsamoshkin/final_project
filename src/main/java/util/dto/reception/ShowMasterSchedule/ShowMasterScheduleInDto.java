@@ -13,18 +13,18 @@ public class ShowMasterScheduleInDto extends AbstractDto{
     private final LocalDate date;
 
 
-    public ShowMasterScheduleInDto(boolean ok, User user, LocalDate date) {
+    private ShowMasterScheduleInDto(boolean ok, User user, LocalDate date) {
         super(ok);
         this.user = user;
         this.date = date;
     }
 
-    public User getUser() {
-        return user;
+    public Optional<User> getUser() {
+        return Optional.ofNullable(user);
     }
 
-    public LocalDate getDate() {
-        return date;
+    public Optional<LocalDate> getDate() {
+        return Optional.ofNullable(date);
     }
 
     public static ShowMasterScheduleInDtoBuilder getBuilder(){

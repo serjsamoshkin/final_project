@@ -14,15 +14,14 @@ import util.datetime.LocalDateTimeFormatter;
 import util.datetime.TimePlanning;
 import util.dto.reception.ShowMasterSchedule.ShowMasterScheduleInDto;
 import util.dto.reception.ShowMasterSchedule.ShowMasterScheduleOutDto;
+import util.dto.reception.changeReception.ChangeReceptionInDto;
 import util.wrappers.ReceptionView;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -38,7 +37,12 @@ public class MasterReceptionService extends AbstractService {
 
         ShowMasterScheduleOutDto.ShowMasterScheduleOutDtoBuilder builder = ShowMasterScheduleOutDto.getBuilder();
 
-        Optional<Master> masterOpt = getMasterByUser(inDto.getUser());
+        if (!inDto.getUser().isPresent() || !inDto.getDate().isPresent()){
+            logger.error("No value in inDto.getUser()or inDto.getDate() in getDailyMasterSchedule of MasterReceptionService");
+            return builder.buildFalse();
+        }
+
+        Optional<Master> masterOpt = getMasterByUser(inDto.getUser().get());
         if (!masterOpt.isPresent()){
             logger.error("No master with User id: " + inDto.getUser());
             return ShowMasterScheduleOutDto.getBuilder().buildFalse();
@@ -47,13 +51,13 @@ public class MasterReceptionService extends AbstractService {
         List<Reception> receptions;
         try (Connection connection = getDataSource().getConnection()){
             receptions = DaoMapper.getMapper().getDao(ReceptionDAO.class)
-                    .getMastersReceptions(inDto.getDate(), List.of(masterOpt.get()), connection);
+                    .getMastersReceptions(inDto.getDate().get(), List.of(masterOpt.get()), connection);
         }catch (SQLException e){
             logger.error(e);
             throw new PersistException(e);
         }
 
-        Map<String, ReceptionView> dailyScheme = TimePlanning.getDailyScheme(inDto.getDate()).stream()
+        Map<String, ReceptionView> dailyScheme = TimePlanning.getDailyScheme(inDto.getDate().get()).stream()
                 .map(LocalDateTimeFormatter::toString)
                 .collect(Collectors.toMap(Function.identity(), t ->
                                 ReceptionView.of(receptions.stream().filter(r -> LocalDateTimeFormatter.toString(r.getTime())
@@ -65,6 +69,72 @@ public class MasterReceptionService extends AbstractService {
 
         return builder.build();
 
+    }
+
+    public boolean changeReception(ChangeReceptionInDto inDto){
+
+        // TODO пробросить пользователя до ошибки
+
+        Reception.Status status;
+        if (inDto.getStatus().isPresent()){
+            try {
+                status = Reception.Status.valueOf(inDto.getStatus().get());
+            }catch (Exception e){
+                logger.error("Incorrect status value in ChangeReceptionInDto in MasterReceptionService. value: " + inDto.getStatus());
+                return false;
+            }
+
+        }else {
+            logger.error("No status value in ChangeReceptionInDto in MasterReceptionService");
+            return false;
+        }
+
+        Reception reception;
+        if (inDto.getId().isPresent()){
+            try (Connection connection = getDataSource().getConnection()){
+                reception = DaoMapper.getMapper().getDao(ReceptionDAO.class).getByPK(Integer.valueOf(inDto.getId().get()), connection);
+            }catch (SQLException e){
+                logger.error(e);
+                return false;
+            }catch (NumberFormatException e){
+                logger.error("String to int converting error. Value is: " + inDto.getId().get());
+                return false;
+            }
+        }else {
+            logger.error("No id value in ChangeReceptionInDto in MasterReceptionService");
+            return false;
+        }
+
+        if (!LocalDateTimeFormatter.toLocalDate(reception.getDay()).isEqual(LocalDate.now())){
+            logger.error("Tried to change reception in another day. reception: " + reception);
+            return false;
+        }
+
+        int version;
+        if (inDto.getVersion().isPresent()){
+            try {
+                version = Integer.valueOf(inDto.getVersion().get());
+            }catch (NumberFormatException e){
+                logger.error("String to int converting error. Value is: " + inDto.getVersion().get());
+                return false;
+            }
+
+        } else {
+            logger.error("No version value in ChangeReceptionInDto in MasterReceptionService");
+            return false;
+        }
+
+
+        try (Connection connection = getDataSource().getConnection()) {
+            DaoMapper.getMapper().getDao(ReceptionDAO.class).safeUpdate(reception, status, version, connection);
+        } catch (SQLException e) {
+            logger.error(e);
+        } catch (ConcurrentModificationException e) {
+            logger.error(e);
+            return false;
+        }
+
+        return true;
     }
 
     private Optional<Master> getMasterByUser(User user){

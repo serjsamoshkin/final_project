@@ -2,7 +2,6 @@ package model.dao.model;
 
 import model.dao.DaoMapper;
 import model.dao.reception.ReceptionDAO;
-import util.wrappers.ImmutableReception;
 import model.entity.reception.Reception;
 import org.junit.After;
 import org.junit.Before;
@@ -30,21 +29,29 @@ public class ReceptionTests {
 
     @Test
     public void duplicateReceptionTest() throws PersistException, RowNotUniqueException{
-
-        MySqlJDBCDaoController daoController = new MySqlJDBCDaoController();
-
+//
+//        MySqlJDBCDaoController daoController = new MySqlJDBCDaoController();
+//
         ReceptionDAO dao = DaoMapper.getMapper().getDao(ReceptionDAO.class);
 
-        Reception reception1 = dao.getByPK(2, connection);
-        ImmutableReception immutableReception1 =  ImmutableReception.of(reception1);
+        dao.getByPK(1, connection);
 
-        Reception reception2 = dao.getByPK(2, connection);
-        ImmutableReception immutableReception2 =  ImmutableReception.of(reception2);
+        System.gc();
 
-        immutableReception2 = immutableReception2.setTime(LocalDateTimeFormatter.toSqlTime(TimePlanning.startOfDay(LocalDate.now())));
+        dao.getByPK(1, connection);
 
-        dao.save(immutableReception1.getReception(), connection);
-        dao.save(immutableReception2.getReception(), connection);
+
+
+
+//        ImmutableReception immutableReception1 =  ImmutableReception.of(reception1);
+//
+//        Reception reception2 = dao.getByPK(2, connection);
+//        ImmutableReception immutableReception2 =  ImmutableReception.of(reception2);
+//
+//        immutableReception2 = immutableReception2.setTime(LocalDateTimeFormatter.toSqlTime(TimePlanning.startOfDay(LocalDate.now())));
+//
+//        dao.save(immutableReception1.getReception(), connection);
+//        dao.save(immutableReception2.getReception(), connection);
 
 //
 //        MasterDAO masterDAO = new MasterDAO(daoController);

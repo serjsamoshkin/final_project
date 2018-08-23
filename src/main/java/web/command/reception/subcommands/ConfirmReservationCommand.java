@@ -1,6 +1,5 @@
 package web.command.reception.subcommands;
 
-import model.service.reception.ConfirmReservationService;
 import model.service.reception.ReservationService;
 import util.wrappers.WrappedUser;
 import web.chainCommandSystem.annotation.WebCommand;
@@ -9,7 +8,6 @@ import web.command.reception.ReceptionCommand;
 import model.service.ServiceMapper;
 import util.dto.reception.ProcessReservation.ProcessReceptionInDto;
 import util.dto.reception.ProcessReservation.ProcessReceptionOutDto;
-import model.service.reception.ShowReceptionService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -51,7 +49,7 @@ public class ConfirmReservationCommand extends RootCommand {
                 forward("/jsp/reception/reservation_failed.jsp", request, response);
             }else {
 
-                boolean done = ServiceMapper.getMapper().getService(ConfirmReservationService.class).confirmReservation(dto,
+                boolean done = ServiceMapper.getMapper().getService(ReservationService.class).confirmReservation(dto,
                         WrappedUser.userOf(request.getSession().getAttribute("user")));
 
                 if (done) {
