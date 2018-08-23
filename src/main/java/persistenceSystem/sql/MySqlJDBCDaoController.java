@@ -227,7 +227,12 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             List<Object> params = criteriaBuilder.getParameters();
 
             for (int i = 0; i < params.size(); i++) {
-                statement.setObject(i + 1, params.get(i));
+                if (params.get(i) instanceof  Enum){
+                    statement.setObject(i + 1, params.get(i).toString());
+                }else {
+                    statement.setObject(i + 1, params.get(i));
+                }
+
             }
 
             ResultSet rs = statement.executeQuery();

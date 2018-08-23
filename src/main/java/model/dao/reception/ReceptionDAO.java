@@ -83,12 +83,14 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
 
         if (masterList.isEmpty()) {
             criteriaBuilder = criteriaBuilder.And(
-                    predicateBuilder.equal("day", LocalDateTimeFormatter.toSqlDate(date))
+                    predicateBuilder.equal("day", LocalDateTimeFormatter.toSqlDate(date)),
+                    predicateBuilder.notEqual("status", Reception.Status.CANCELED)
             );
         }else {
             criteriaBuilder = criteriaBuilder.And(
                     predicateBuilder.equal("day", LocalDateTimeFormatter.toSqlDate(date)),
-                    predicateBuilder.in("master", masterList.stream().map(Master::getId).collect(Collectors.toList()))
+                    predicateBuilder.in("master", masterList.stream().map(Master::getId).collect(Collectors.toList())),
+                    predicateBuilder.notEqual("status", Reception.Status.CANCELED)
             );
         }
 
@@ -109,17 +111,17 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
         Generates a query like:
         SELECT * FROM beauty_saloon.receptions
         WHERE
-            (reception_id <> 8  AND masters_master_id = 1  AND reception_day = '2018-08-18'
-                AND (
-                        (reception_time < '10:00:00'  AND reception_end_time > '10:00:00' ) OR (reception_time < '12:00:00'  AND reception_end_time > '12:00:00' )
-                        OR reception_time = '10:00:00'
-                    )
+            (reception_id <> 8  AND masters_master_id = 1  AND reception_day = '2018-08-18' AND reception_status <> 'CANCELED'
+                AND ((reception_time < '10:00:00'  AND reception_end_time > '10:00:00' )
+                    OR  (reception_time < '12:00:00'  AND reception_end_time > '12:00:00' )
+                    OR  reception_time = '10:00:00')
             );
          */
         criteriaBuilder = criteriaBuilder.And(
                 predicateBuilder.notEqual("id", recId.orElse(-1)),
                 predicateBuilder.equal("master", master.getId()),
                 predicateBuilder.equal("day", LocalDateTimeFormatter.toSqlDate(date)),
+                predicateBuilder.notEqual("status", Reception.Status.CANCELED),
                 criteriaBuilder.Or(
                         criteriaBuilder.And(
                                 predicateBuilder.less("time", sqlStartTime),
@@ -147,10 +149,11 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
             beauty_saloon.services
                 JOIN beauty_saloon.masters_services ON services.service_id = masters_services.services_service_id
                 JOIN beauty_saloon.masters ON masters_services.masters_master_id = masters.master_id
-                LEFT JOIN beauty_saloon.receptions ON masters.master_id = receptions.masters_master_id
+                LEFT JOIN beauty_saloon.receptions ON masters.master_id = receptions.masters_master_id AND
+                    receptions.reception_time > '12:00:00' AND receptions.reception_day = '2018-08-19'
+                    AND receptions.reception_status <> 'CANCELED'
         WHERE
-            masters.master_id = '1' AND ((receptions.reception_time > '12:00:00' AND receptions.reception_day = '2018-08-19')
-            OR receptions.reception_time IS NULL)
+            masters.master_id = '1'
         GROUP BY services.service_id
         ) AS t
         WHERE min_time >= '12:00:00' OR min_time is null
@@ -165,20 +168,21 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
                 "    beauty_saloon.services\n" +
                 "        JOIN beauty_saloon.masters_services ON services.service_id = masters_services.services_service_id\n" +
                 "        JOIN beauty_saloon.masters ON masters_services.masters_master_id = masters.master_id\n" +
-                "        LEFT JOIN beauty_saloon.receptions ON masters.master_id = receptions.masters_master_id\n" +
+                "        LEFT JOIN beauty_saloon.receptions ON masters.master_id = receptions.masters_master_id " +
+                "           AND receptions.reception_day = ? AND receptions.reception_time > ? " +
+                "           AND receptions.reception_status <> 'CANCELED'\n" +
                 "WHERE\n" +
-                "    masters.master_id = ? AND ((receptions.reception_day = ? AND receptions.reception_time > ?)  \n" +
-                "    OR receptions.reception_time IS NULL)\n" +
+                "    masters.master_id = ? \n" +
                 "GROUP BY services.service_id\n" +
                 ") AS t\n" +
-                "WHERE min_time >= ? OR min_time is null";
+                "WHERE min_time is null OR min_time >= ?";
 
         CriteriaBuilder<Service> criteriaBuilder = controller.getCriteriaBuilder(Service.class);
         criteriaBuilder = criteriaBuilder.rowQuery(query,
                 List.of(TimePlanning.getTimeModulator(),
-                        master.getId(),
                         LocalDateTimeFormatter.toSqlDate(date),
                         LocalDateTimeFormatter.toSqlTime(time),
+                        master.getId(),
                         LocalDateTimeFormatter.toSqlTime(time)));
 
         List<Service> list =  controller.getByCriteria(Service.class, criteriaBuilder, connection);

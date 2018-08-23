@@ -45,8 +45,7 @@ public class ProcessReservationCommand extends RootCommand {
 
         if (dto.isOk()) {
             if (dto.isReserved()){
-                // TODO кинуть на стричку с извинениями
-                forward(Page.PAGE_500, request, response);
+                forward("/reception/reservation_failed.jsp", request, response);
             }else {
                 request.setAttribute("service_map", dto.getServiceMap());
                 request.setAttribute("date", dto.getDate());

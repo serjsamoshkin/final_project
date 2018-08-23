@@ -21,9 +21,6 @@ public class RootCommand extends Command<String> {
 
     protected static final Logger rootLoger = LogManager.getLogger(RootCommand.class);
 
-    // TODO попробовать инкапсулировать request и response в полях.
-    // Тогда можно как минимум редирект делать без лишних переменных.
-
     public RootCommand(ServletContext servletContext) {
         super(servletContext);
     }
@@ -135,6 +132,7 @@ public class RootCommand extends Command<String> {
 
     protected enum Page {
         DEF("/"),
+        PAGE_403("/jsp/error/error403.jsp"),
         PAGE_404("/jsp/error/error404.jsp"),
         PAGE_500("/jsp/error/error500.jsp");
 
