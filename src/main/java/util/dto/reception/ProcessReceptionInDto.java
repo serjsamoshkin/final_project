@@ -1,4 +1,4 @@
-package util.dto.reception.processReservation;
+package util.dto.reception;
 
 import util.dto.AbstractDto;
 import util.dto.AbstractDtoBuilder;

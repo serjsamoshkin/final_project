@@ -1,11 +1,10 @@
-package util.dto.reception.showUserReceptions;
+package util.dto.reception;
 
 import util.dto.AbstractDto;
 import util.dto.AbstractDtoBuilder;
 import util.wrappers.ReceptionView;
 
 import java.util.List;
-import java.util.Map;
 
 public class ShowUserReceptionsOutDto extends AbstractDto{
 

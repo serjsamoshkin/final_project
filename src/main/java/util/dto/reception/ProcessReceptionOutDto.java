@@ -1,4 +1,4 @@
-package util.dto.reception.processReservation;
+package util.dto.reception;
 
 import model.entity.reception.Master;
 import model.entity.reception.Service;

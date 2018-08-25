@@ -1,5 +1,7 @@
 package util.properties;
 
+import java.util.Properties;
+
 public interface PropertiesReader {
 
     /**

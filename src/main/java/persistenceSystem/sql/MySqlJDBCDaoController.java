@@ -219,6 +219,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             str.append(" WHERE ");
             str.append(criteriaBuilder.getText());
             str.append(criteriaBuilder.getOrderText());
+            str.append(criteriaBuilder.getLimitText());
 
         }else {
             str = new StringBuilder(criteriaBuilder.getQueryText());

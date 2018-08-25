@@ -1,11 +1,11 @@
-package util.dto.reception.showReception;
+package util.dto.reception;
 
 import util.dto.AbstractDto;
 import util.dto.AbstractDtoBuilder;
 
 import java.util.Optional;
 
-public class ShowReceptionInDto extends AbstractDto{
+public class ShowReceptionInDto extends AbstractDto {
 
     private String day;
     private String service;
@@ -28,7 +28,7 @@ public class ShowReceptionInDto extends AbstractDto{
         return new ShowReceptionInDtoBuilder();
     }
 
-    public static class ShowReceptionInDtoBuilder extends AbstractDtoBuilder{
+    public static class ShowReceptionInDtoBuilder extends AbstractDtoBuilder {
         private String day;
         private String service;
 

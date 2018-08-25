@@ -84,6 +84,27 @@ public class MySqlCriteriaBuilder<T> extends CriteriaBuilder<T> {
     }
 
     @Override
+    public String getLimitText() {
+        CriteriaBuilder<T>  root = getRoot();
+        if (root == null){
+            root = this;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (root.getLimit()[0] != 0 || root.getLimit()[1] != 0) {
+            stringBuilder.append(" LIMIT ");
+            stringBuilder.append(root.getLimit()[0]);
+            if (root.getLimit()[1] != 0){
+                stringBuilder.append(",");
+                stringBuilder.append(root.getLimit()[1]);
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    @Override
     public <E> PredicateBuilder<E> getPredicateBuilder(Class<E> clazz) throws PersistException {
         return new MySqlPredicateBuilder<>(clazz, this);
     }

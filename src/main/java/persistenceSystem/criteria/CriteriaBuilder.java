@@ -24,7 +24,7 @@ public abstract class CriteriaBuilder<T> implements Criteria {
 
     private Map<String, Order> orderMap = new TreeMap<>();
 
-    private Integer[] limit = new Integer[2];
+    private int[] limit = new int[2];
 
 
     /**
@@ -75,6 +75,8 @@ public abstract class CriteriaBuilder<T> implements Criteria {
 
     public abstract String getOrderText();
 
+    public abstract String getLimitText();
+
     /**
      * Sets the number of rows for output.
      * Limit [0, 20] means from 0 index to 19 index position.
@@ -92,6 +94,14 @@ public abstract class CriteriaBuilder<T> implements Criteria {
         root.limit[1] = end;
 
         return root;
+    }
+
+    public int[] getLimit(){
+       int[] limitCopy = new int[2];
+        limitCopy[0] = limit[0];
+        limitCopy[1] = limit[1];
+
+       return limitCopy;
     }
 
     public abstract<E> PredicateBuilder<E> getPredicateBuilder(Class<E> clazz) throws PersistException;

@@ -15,8 +15,8 @@ import persistenceSystem.PersistException;
 import persistenceSystem.RowNotUniqueException;
 import util.datetime.LocalDateTimeFormatter;
 import util.datetime.TimePlanning;
-import util.dto.reception.processReservation.ProcessReceptionInDto;
-import util.dto.reception.processReservation.ProcessReceptionOutDto;
+import util.dto.reception.ProcessReceptionInDto;
+import util.dto.reception.ProcessReceptionOutDto;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

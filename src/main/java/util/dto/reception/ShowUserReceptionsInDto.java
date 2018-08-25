@@ -1,19 +1,18 @@
-package util.dto.reception.showUserReceptions;
+package util.dto.reception;
 
 import model.entity.authentication.User;
 import util.dto.AbstractDto;
 import util.dto.AbstractDtoBuilder;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 public class ShowUserReceptionsInDto extends AbstractDto{
 
     private final User user;
-    private final int page;
+    private final String page;
 
 
-    private ShowUserReceptionsInDto(boolean ok, User user, int page) {
+    private ShowUserReceptionsInDto(boolean ok, User user, String page) {
         super(ok);
         this.user = user;
         this.page = page;
@@ -23,7 +22,7 @@ public class ShowUserReceptionsInDto extends AbstractDto{
         return Optional.ofNullable(user);
     }
 
-    public Optional<Integer> getPage() {
+    public Optional<String> getPage() {
         return Optional.ofNullable(page);
     }
 
@@ -33,14 +32,14 @@ public class ShowUserReceptionsInDto extends AbstractDto{
 
     public static class ShowUserReceptionsInDtoBuilder extends AbstractDtoBuilder{
         private User user;
-        private int page;
+        private String page;
 
         public ShowUserReceptionsInDtoBuilder setUser(User user) {
             this.user = user;
             return this;
         }
 
-        public ShowUserReceptionsInDtoBuilder setPage(int page) {
+        public ShowUserReceptionsInDtoBuilder setPage(String page) {
             this.page = page;
             return this;
         }

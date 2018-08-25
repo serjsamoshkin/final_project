@@ -13,6 +13,7 @@ import persistenceSystem.criteria.CriteriaBuilder;
 import persistenceSystem.criteria.predicates.PredicateBuilder;
 import util.datetime.LocalDateTimeFormatter;
 import util.datetime.TimePlanning;
+import util.properties.PaginationPropertiesReader;
 
 
 import java.sql.Connection;
@@ -212,7 +213,7 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
 
     }
 
-    public List<Reception> getUserReceptions(User user, Connection connection){
+    public List<Reception> getUserReceptions(User user, Connection connection, int page){
 
         CriteriaBuilder<Reception> criteriaBuilder = controller.getCriteriaBuilder(Reception.class);
         PredicateBuilder<Reception> predicateBuilder = criteriaBuilder.getPredicateBuilder(Reception.class);
@@ -227,12 +228,16 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
             users_user_id = '1';
          */
 
+        int rowsForPage = Integer.valueOf(PaginationPropertiesReader.getInstance()
+                .getPropertyValue("user_reception_count"));
+
         criteriaBuilder = criteriaBuilder.And(
                 predicateBuilder.equal("user", user.getId())
         );
 
         criteriaBuilder.orderBy(Reception.class, "day", CriteriaBuilder.Order.ASC);
         criteriaBuilder.orderBy(Reception.class, "time", CriteriaBuilder.Order.ASC);
+        criteriaBuilder.limit(rowsForPage*(page-1), rowsForPage*page);
 
         return controller.getByCriteria(Reception.class, criteriaBuilder, connection);
 

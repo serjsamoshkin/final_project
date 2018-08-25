@@ -1,4 +1,4 @@
-package util.dto.reception.changeReception;
+package util.dto.reception;
 
 import util.dto.AbstractDto;
 import util.dto.AbstractDtoBuilder;
