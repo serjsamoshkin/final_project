@@ -1,4 +1,4 @@
-package util.dto.reception.ShowMasterSchedule;
+package util.dto.reception.showMasterSchedule;
 
 import util.dto.AbstractDto;
 import util.dto.AbstractDtoBuilder;
@@ -27,8 +27,9 @@ public class ShowMasterScheduleOutDto extends AbstractDto{
         private Map<String, ReceptionView> schedule;
 
 
-        public void setSchedule(Map<String, ReceptionView> schedule) {
+        public ShowMasterScheduleOutDtoBuilder setSchedule(Map<String, ReceptionView> schedule) {
             this.schedule = schedule;
+            return this;
         }
 
         @Override

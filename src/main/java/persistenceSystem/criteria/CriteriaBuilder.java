@@ -1,11 +1,13 @@
 package persistenceSystem.criteria;
 
 import persistenceSystem.PersistException;
+import persistenceSystem.annotations.Column;
+import persistenceSystem.annotations.JoinColumn;
 import persistenceSystem.criteria.predicates.PredicateBuilder;
+import persistenceSystem.util.Reflect;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.lang.reflect.Field;
+import java.util.*;
 
 public abstract class CriteriaBuilder<T> implements Criteria {
     private Combinator type;
@@ -19,6 +21,11 @@ public abstract class CriteriaBuilder<T> implements Criteria {
     private ArrayList<Object> parameters = new ArrayList<>();
 
     private String queryText;
+
+    private Map<String, Order> orderMap = new TreeMap<>();
+
+    private Integer[] limit = new Integer[2];
+
 
     /**
      * Root level CriteriaBuilder can only be obtained from JDBCDaoController subtypes.
@@ -47,6 +54,45 @@ public abstract class CriteriaBuilder<T> implements Criteria {
     public abstract CriteriaBuilder<T> Or(Criteria... condition);
 
     public abstract CriteriaBuilder<T> rowQuery(String query, Collection<?> params);
+
+    public<O> CriteriaBuilder<T> orderBy(Class<O> clazz, String fieldName, Order order) {
+        CriteriaBuilder<T> root = getRoot();
+        if (root == null) {
+            root = this;
+        }
+        root.orderMap.put(Reflect.getSqlFieldName(clazz, fieldName), order);
+
+        return root;
+    }
+
+    /**
+     * returns unmodifiableMap as result.
+     * @return unmodifiableMap of ORDER BY commands in order of insertion
+     */
+    public Map<String, Order> getOrderMap(){
+        return Collections.unmodifiableMap(orderMap);
+    }
+
+    public abstract String getOrderText();
+
+    /**
+     * Sets the number of rows for output.
+     * Limit [0, 20] means from 0 index to 19 index position.
+     * If need limit of [50 - infinity]  - set [50, 0].
+     * @param start start index. Starts from 0
+     * @param end end index. Not including.
+     * @return
+     */
+    public CriteriaBuilder<T> limit(int start, int end){
+        CriteriaBuilder<T> root = getRoot();
+        if (root == null) {
+            root = this;
+        }
+        root.limit[0] = start;
+        root.limit[1] = end;
+
+        return root;
+    }
 
     public abstract<E> PredicateBuilder<E> getPredicateBuilder(Class<E> clazz) throws PersistException;
 
@@ -104,6 +150,11 @@ public abstract class CriteriaBuilder<T> implements Criteria {
             return new ArrayList<>(parameters);
         }
         return getRoot().getParameters();
+    }
+
+    public enum Order{
+        ASC,
+        DECS;
     }
 
 }

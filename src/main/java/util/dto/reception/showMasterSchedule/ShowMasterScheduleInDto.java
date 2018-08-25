@@ -1,4 +1,4 @@
-package util.dto.reception.ShowMasterSchedule;
+package util.dto.reception.showMasterSchedule;
 
 import model.entity.authentication.User;
 import util.dto.AbstractDto;

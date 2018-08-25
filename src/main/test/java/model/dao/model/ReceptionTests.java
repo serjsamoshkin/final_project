@@ -34,11 +34,15 @@ public class ReceptionTests {
 //
         ReceptionDAO dao = DaoMapper.getMapper().getDao(ReceptionDAO.class);
 
-        dao.getByPK(1, connection);
+        Reception rec = dao.getByPK(2, connection);
+
+        rec.setStatus(Reception.Status.CANCELED);
+
+        dao.update(rec, connection);
 
         System.gc();
 
-        dao.getByPK(1, connection);
+        dao.getByPK(2, connection);
 
 
 

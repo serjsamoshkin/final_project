@@ -2,6 +2,7 @@ package model.dao.reception;
 
 import model.dao.GenericDAO;
 
+import model.entity.authentication.User;
 import model.entity.reception.Master;
 import model.entity.reception.Reception;
 import model.entity.reception.Service;
@@ -15,6 +16,9 @@ import util.datetime.TimePlanning;
 
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -35,7 +39,6 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
     public ReceptionDAO(JDBCDaoController controller) {
         this.controller = controller;
     }
-
 
     @Override
     public Reception getByPK(Integer key, Connection connection) throws PersistException {
@@ -141,6 +144,26 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
 
     public Set<Service> getServiceListForTimeAndMaster(LocalDate date, LocalTime time, Master master, Connection connection) {
 
+
+        //language=MySQL
+//        String query =
+//                "CREATE TEMPORARY TABLE tmp\n" +
+//                "SELECT services.*, MIN(DATE_ADD(receptions.reception_time, INTERVAL - services.service_duration * ? MINUTE)) AS min_time\n" +
+//                "FROM\n" +
+//                "    beauty_saloon.services\n" +
+//                "        JOIN beauty_saloon.masters_services ON services.service_id = masters_services.services_service_id\n" +
+//                "        JOIN beauty_saloon.masters ON masters_services.masters_master_id = masters.master_id\n" +
+//                "        LEFT JOIN beauty_saloon.receptions ON masters.master_id = receptions.masters_master_id " +
+//                "           AND receptions.reception_day = ? AND receptions.reception_time > ? " +
+//                "           AND receptions.reception_status <> 'CANCELED'\n" +
+//                "WHERE\n" +
+//                "    masters.master_id = ? \n" +
+//                "GROUP BY services.service_id;\n" +
+//
+//                "SELECT tmp.* \n" +
+//                "FROM tmp \n" +
+//                "WHERE min_time IS NULL OR min_time >= ?";
+
         /*
         SELECT t.*
         FROM (
@@ -163,17 +186,16 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
         String query =
                 "SELECT t.* \n" +
                 "FROM (\n" +
-                "    SELECT services.*, MIN(DATE_ADD(receptions.reception_time, INTERVAL - services.service_duration * ? MINUTE)) AS min_time\n" +
-                "FROM\n" +
-                "    beauty_saloon.services\n" +
-                "        JOIN beauty_saloon.masters_services ON services.service_id = masters_services.services_service_id\n" +
-                "        JOIN beauty_saloon.masters ON masters_services.masters_master_id = masters.master_id\n" +
-                "        LEFT JOIN beauty_saloon.receptions ON masters.master_id = receptions.masters_master_id " +
-                "           AND receptions.reception_day = ? AND receptions.reception_time > ? " +
-                "           AND receptions.reception_status <> 'CANCELED'\n" +
-                "WHERE\n" +
-                "    masters.master_id = ? \n" +
-                "GROUP BY services.service_id\n" +
+                "   SELECT services.*, MIN(DATE_ADD(receptions.reception_time, INTERVAL - services.service_duration * ? MINUTE)) AS min_time\n" +
+                "   FROM\n" +
+                "       services\n" +
+                "        JOIN masters_services ON services.service_id = masters_services.services_service_id\n" +
+                "        JOIN masters ON masters_services.masters_master_id = masters.master_id\n" +
+                "        LEFT JOIN receptions ON masters.master_id = receptions.masters_master_id AND receptions.reception_day > ?" +
+                "           AND receptions.reception_time = ? AND receptions.reception_STATUS <> 'CANCELED'\n" +
+                "   WHERE\n" +
+                "   masters.master_id = ? \n" +
+                "   GROUP BY services.service_id\n" +
                 ") AS t\n" +
                 "WHERE min_time is null OR min_time >= ?";
 
@@ -187,6 +209,55 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
 
         List<Service> list =  controller.getByCriteria(Service.class, criteriaBuilder, connection);
         return new HashSet<>(list);
+
+    }
+
+    public List<Reception> getUserReceptions(User user, Connection connection){
+
+        CriteriaBuilder<Reception> criteriaBuilder = controller.getCriteriaBuilder(Reception.class);
+        PredicateBuilder<Reception> predicateBuilder = criteriaBuilder.getPredicateBuilder(Reception.class);
+
+         /*
+        Generates query like:
+        SELECT
+            *
+        FROM
+            beauty_saloon.receptions
+        WHERE
+            users_user_id = '1';
+         */
+
+        criteriaBuilder = criteriaBuilder.And(
+                predicateBuilder.equal("user", user.getId())
+        );
+
+        criteriaBuilder.orderBy(Reception.class, "day", CriteriaBuilder.Order.ASC);
+        criteriaBuilder.orderBy(Reception.class, "time", CriteriaBuilder.Order.ASC);
+
+        return controller.getByCriteria(Reception.class, criteriaBuilder, connection);
+
+    }
+
+    public int getUserReceptionsCount(User user, Connection connection){
+
+        //language=MySQL
+        String query =
+                "SELECT count(*)\n" +
+                        "FROM receptions receptions\n" +
+                        "WHERE receptions.users_user_id = ? ";
+
+        int count = 0;
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setObject(1, user.getId());
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()){
+                count = rs.getInt(1);
+            }
+        }catch (SQLException e){
+            throw new PersistException(e);
+        }
+
+        return count;
 
     }
 

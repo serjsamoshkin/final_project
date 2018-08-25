@@ -13,7 +13,7 @@
     <div class="container-fluid">
 
         <div class="col-lg-8 ">
-
+            ${master.name}!!!!!
             <table class="table table-hover">
                 <tr>
                     <th><fmt:message key="reception-time"/></th>
@@ -39,7 +39,7 @@
                             </c:otherwise>
                         </c:choose>
                         <c:choose>
-                            <c:when test="${reception.reserved == true and reception.processed == false}">
+                            <c:when test="${reception.processed == false}">
                                 <td>
                                     <a href="javascript: submit_done('${reception.id}', '${reception.version}')"><fmt:message key="done"/></a>
                                 </td>

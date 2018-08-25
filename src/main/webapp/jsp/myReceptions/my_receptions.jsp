@@ -12,49 +12,38 @@
 
     <div class="container-fluid">
 
-        <div class="col-lg-8 ">
-
+        <div class="col-lg-12">
             <table class="table table-hover">
                 <tr>
                     <th><fmt:message key="reception-time"/></th>
-                    <th><fmt:message key="client-name"/></th>
+                    <th><fmt:message key="reception-end-time"/></th>
                     <th><fmt:message key="client-service"/></th>
                     <th><fmt:message key="reception-status"/></th>
                     <th></th>
                     <th></th>
                 </tr>
-                <c:forEach items="${master_schedule}" var="schedule">
-                    <c:set var="reception" scope="page" value="${schedule.value}"/>
-                    <c:set var="time" scope="page" value="${schedule.key}"/>
+                <c:forEach items="${reception_list}" var="reception">
                     <tr>
-                        <td><ex:formatTime shortTime="${time}"/></td>
-                        <c:choose>
-                            <c:when test="${reception.reserved == true}">
-                                <td>${reception.user}</td>
-                                <td>${reception.service}</td>
-                                <td><fmt:message key="status-${reception.status}"/></td>
-                            </c:when>
-                            <c:otherwise>
-                                <td></td><td></td><td></td>
-                            </c:otherwise>
-                        </c:choose>
-                        <c:choose>
-                            <c:when test="${reception.reserved == true and reception.processed == false}">
-                                <td>
-                                    <a href="javascript: submit_done('${reception.id}', '${reception.version}')"><fmt:message key="done"/></a>
-                                </td>
-                                <td>
-                                    <a href="javascript: submit_canceled('${reception.id}', '${reception.version}')"><fmt:message key="canceled"/></a>
-                                </td>
-                            </c:when>
-                            <c:otherwise>
-                                <td></td><td></td>
-                            </c:otherwise>
-                        </c:choose>
+                        <td><ex:formatTime shortTime="${reception.time}"/></td>
+                        <td><ex:formatTime shortTime="${reception.endTime}"/></td>
+                        <td>${reception.service}</td>
+                        <td><fmt:message key="status-${reception.status}"/></td>
                     </tr>
                 </c:forEach>
             </table>
+            <nav aria-label="pages">
+                <ul class="pagination">
+                    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                    <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+                    <li>
+                        <a href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
+
     </div>
 </div>
 

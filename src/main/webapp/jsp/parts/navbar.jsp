@@ -39,8 +39,8 @@
                     </li>
                 </c:if>
                 <c:if test="${user.user == true}">
-                    <li class="nav-item ${reception_active}">
-                        <a class="nav-link" href="<c:url value="/reception/show_receptions"/>"><fmt:message key="my-receptions"/></a>
+                    <li class="nav-item ${my_receptions_active}">
+                        <a class="nav-link" href="<c:url value="/my_receptions/show_my_receptions"/>"><fmt:message key="my-receptions"/></a>
                     </li>
                 </c:if>
                 <c:if test="${user.authenticated == false}">

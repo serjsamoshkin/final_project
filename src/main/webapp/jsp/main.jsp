@@ -27,8 +27,6 @@
 
     <h3><c:out value="Добро пожаловать, ${user.name}!"/></h3>
 
-    ${user.admin}
-
 </div>
 
 

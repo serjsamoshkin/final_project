@@ -12,8 +12,8 @@ import org.apache.logging.log4j.Logger;
 import persistenceSystem.PersistException;
 import util.datetime.LocalDateTimeFormatter;
 import util.datetime.TimePlanning;
-import util.dto.reception.ShowMasterSchedule.ShowMasterScheduleInDto;
-import util.dto.reception.ShowMasterSchedule.ShowMasterScheduleOutDto;
+import util.dto.reception.showMasterSchedule.ShowMasterScheduleInDto;
+import util.dto.reception.showMasterSchedule.ShowMasterScheduleOutDto;
 import util.dto.reception.changeReception.ChangeReceptionInDto;
 import util.wrappers.ReceptionView;
 

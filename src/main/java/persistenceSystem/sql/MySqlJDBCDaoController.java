@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MySqlJDBCDaoController extends JDBCDaoController {
 
@@ -216,8 +217,9 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             criteriaBuilder.getTableJoins().forEach(c -> str.append(c.getText()));
 
             str.append(" WHERE ");
-
             str.append(criteriaBuilder.getText());
+            str.append(criteriaBuilder.getOrderText());
+
         }else {
             str = new StringBuilder(criteriaBuilder.getQueryText());
         }
@@ -232,7 +234,6 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                 }else {
                     statement.setObject(i + 1, params.get(i));
                 }
-
             }
 
             ResultSet rs = statement.executeQuery();
@@ -342,33 +343,38 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
         String str = "";
 
         if (clazz.isAnnotationPresent(VersionControl.class)) {
-            for (Field field : clazz.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Version.class)) {
-                    str = field.getAnnotation(Column.class).name();
-                }
-            }
-            if (str.isEmpty()) {
-                throw new PersistException("No field is annotated as @Version.");
-            }
+            str = Arrays.stream(clazz.getDeclaredFields()).
+                    filter(f -> f.isAnnotationPresent(Version.class) && f.isAnnotationPresent(Column.class)).findFirst().
+                    orElseThrow(() -> new PersistException("Incorrect annotated class with VersionControl: " + clazz))
+                    .getAnnotation(Column.class).name();
+
+//            for (Field field : clazz.getDeclaredFields()) {
+//                if (field.isAnnotationPresent(Version.class)) {
+//                    str = field.getAnnotation(Column.class).name();
+//                }
+//            }
+//            if (str.isEmpty()) {
+//                throw new PersistException("No field is annotated as @Version.");
+//            }
         }
         return str;
     }
 
     private String getSqlFieldName(Field field) throws PersistException {
 
-        String fieldName;
+//        String fieldName;
+//
+//        if (field.isAnnotationPresent(Column.class)) {
+//            fieldName = field.getAnnotation(Column.class).name();
+//        } else if (field.isAnnotationPresent(JoinColumn.class)) {
+//            fieldName = field.getAnnotation(JoinColumn.class).name();
+//        } else {
+//            throw new PersistException(
+//                    String.format("Field %s doesn't annotated with Column or JoinColumn annotation in class %s.",
+//                            field.getName(), field.getType()));
+//        }
 
-        if (field.isAnnotationPresent(Column.class)) {
-            fieldName = field.getAnnotation(Column.class).name();
-        } else if (field.isAnnotationPresent(JoinColumn.class)) {
-            fieldName = field.getAnnotation(JoinColumn.class).name();
-        } else {
-            throw new PersistException(
-                    String.format("Field %s doesn't annotated with Column annotation.",
-                            field.getName()));
-        }
-
-        return fieldName;
+        return Reflect.getSqlFieldName(field);
     }
 
     /**
@@ -379,18 +385,22 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
     private <T> String getSQLFieldsName(Class<T> clazz) throws PersistException {
         StringBuilder str = new StringBuilder();
 
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Column.class)) {
-                str.append(field.getAnnotation(Column.class).name());
-                str.append(",");
-            } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
-                if (!field.isAnnotationPresent(JoinColumn.class)) {
-                    throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne field");
-                }
-                str.append(field.getAnnotation(JoinColumn.class).name());
-                str.append(",");
-            }
-        }
+        Arrays.stream(clazz.getDeclaredFields())
+                .map(f -> Reflect.getSqlFieldName(f, false, ","))
+                .filter(s -> !s.isEmpty()).forEach(str::append);
+
+//        for (Field field : clazz.getDeclaredFields()) {
+//            if (field.isAnnotationPresent(Column.class)) {
+//                str.append(field.getAnnotation(Column.class).name());
+//                str.append(",");
+//            } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
+//                if (!field.isAnnotationPresent(JoinColumn.class)) {
+//                    throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne field");
+//                }
+//                str.append(field.getAnnotation(JoinColumn.class).name());
+//                str.append(",");
+//            }
+//        }
 
         if (str.length() == 0) {
             throw new PersistException("No fields are annotated as Column in " + clazz.getName());
@@ -410,18 +420,25 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
     private <T> String getSQLInsertFieldsName(Class<T> clazz) throws PersistException {
         StringBuilder str = new StringBuilder();
 
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class)) {
-                str.append(field.getAnnotation(Column.class).name());
-                str.append(",");
-            } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
-                if (!field.isAnnotationPresent(JoinColumn.class)) {
-                    throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne field");
-                }
-                str.append(field.getAnnotation(JoinColumn.class).name());
-                str.append(",");
-            }
-        }
+        Arrays.stream(clazz.getDeclaredFields()).filter(f -> !f.isAnnotationPresent(Id.class))
+                .map(f -> Reflect.getSqlFieldName(f, false, ","))
+                .filter(s -> !s.isEmpty()).forEach(str::append);
+
+//        for (Field field : clazz.getDeclaredFields()) {
+//            if (field.isAnnotationPresent(Id.class)){
+//                continue;
+//            }
+//            if (field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class)) {
+//                str.append(field.getAnnotation(Column.class).name());
+//                str.append(",");
+//            } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
+//                if (!field.isAnnotationPresent(JoinColumn.class)) {
+//                    throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne field");
+//                }
+//                str.append(field.getAnnotation(JoinColumn.class).name());
+//                str.append(",");
+//            }
+//        }
 
         if (str.length() == 0) {
             throw new PersistException("No fields are annotated as Column in " + clazz.getName());
@@ -429,7 +446,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             str.deleteCharAt(str.length() - 1);
         }
 
-        //return "id, number, department";
+        //return "number, department";
         return str.toString();
     }
 
@@ -441,18 +458,22 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
     private <T> String getSQLInsertValuesName(Class<T> clazz) throws PersistException {
         StringBuilder str = new StringBuilder();
 
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class)) {
-                str.append("?");
-                str.append(",");
-            } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
-                if (!field.isAnnotationPresent(JoinColumn.class)) {
-                    throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne/OneToOne field");
-                }
-                str.append("?");
-                str.append(",");
-            }
-        }
+        Arrays.stream(clazz.getDeclaredFields()).filter(f -> !f.isAnnotationPresent(Id.class))
+                .map(f -> Reflect.getEmptySqlFieldName(f, false, " ?,"))
+                .filter(s -> !s.isEmpty()).forEach(str::append);
+
+//        for (Field field : clazz.getDeclaredFields()) {
+//            if (field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class)) {
+//                str.append("?");
+//                str.append(",");
+//            } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
+//                if (!field.isAnnotationPresent(JoinColumn.class)) {
+//                    throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne/OneToOne field");
+//                }
+//                str.append("?");
+//                str.append(",");
+//            }
+//        }
 
         if (str.length() == 0) {
             throw new PersistException("No fields are annotated as Column in " + clazz.getName());
@@ -471,20 +492,24 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
 
         StringBuilder str = new StringBuilder();
 
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class)) {
-                str.append(field.getAnnotation(Column.class).name());
-                str.append(" = ?");
-                str.append(",");
-            } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
-                if (!field.isAnnotationPresent(JoinColumn.class)) {
-                    throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne fiaeld");
-                }
-                str.append(field.getAnnotation(JoinColumn.class).name());
-                str.append(" = ?");
-                str.append(",");
-            }
-        }
+        Arrays.stream(clazz.getDeclaredFields()).filter(f -> !f.isAnnotationPresent(Id.class))
+                .map(f -> Reflect.getSqlFieldName(f, false, " = ?,"))
+                .filter(s -> !s.isEmpty()).forEach(str::append);
+
+//        for (Field field : clazz.getDeclaredFields()) {
+//            if (field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class)) {
+//                str.append(field.getAnnotation(Column.class).name());
+//                str.append(" = ?");
+//                str.append(",");
+//            } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
+//                if (!field.isAnnotationPresent(JoinColumn.class)) {
+//                    throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne fiaeld");
+//                }
+//                str.append(field.getAnnotation(JoinColumn.class).name());
+//                str.append(" = ?");
+//                str.append(",");
+//            }
+//        }
 
         if (str.length() == 0) {
             throw new PersistException("No fields are annotated as Column in " + clazz.getName());
@@ -550,75 +575,54 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
 
 
     /**
-     * Устанавливает ID ссылки вторичного ключа в переданный statement на указанную позицию.
-     * @param key
-     * @param statement
-     * @param incr
-     * @param <PK>
-     * @throws PersistException
-     */
-    private <PK> void setPkIdToStatement(PK key, PreparedStatement statement, int incr) throws PersistException {
-        @SuppressWarnings("unchecked")
-        Class<PK> clazz = (Class<PK>) key.getClass();
-        Field IdField = null;
-        try {
-            for (Field field : clazz.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Id.class)) {
-                    IdField = field;
-                }
-            }
-        } catch (Exception e) {
-            throw new PersistException(e);
-        }
-        if (IdField == null) {
-            throw new PersistException("No Id field in class: " + clazz);
-        }
-        try {
-            statement.setObject(incr, Reflect.getGetterMethodByField(clazz, IdField).invoke(key));
-        } catch (Exception e) {
-            throw new PersistException(e);
-        }
-    }
-
-
-    /**
      * Устанавливает аргументы update запроса в соответствии со значением полей объекта object.
      */
     private <T> void prepareStatementForUpdate(PreparedStatement statement, T object) throws PersistException {
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>) object.getClass();
 
-        try {
-            int i = 0;
-            Field fieldId = null;
-            for (Field field : clazz.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Column.class)) {
-                    if (field.isAnnotationPresent(Id.class)){
-                        fieldId = field;
-                    }else if(field.isAnnotationPresent(EnumType.class)){
-                        statement.setObject(++i, Reflect.getGetterMethodByField(clazz, field).invoke(object).toString());
-                    }else {
-                        statement.setObject(++i, Reflect.getGetterMethodByField(clazz, field).invoke(object));
-                    }
-                } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
-                    if (field.isAnnotationPresent(JoinColumn.class)) {
-                        statement.setObject(++i, getId(Reflect.getGetterMethodByField(clazz, field).invoke(object)));
-                    }else {
-                        throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne field");
-                    }
-                }
-            }
-            if (fieldId != null) {
-                /* Сначала заполняются поля не идентификаторы, идентификатор получает последний номер,
-                 * так как идентификатор записи передается последним аргументом в запрос
-                 */
-                statement.setObject(++i, Reflect.getGetterMethodByField(clazz, fieldId).invoke(object));
-            } else {
-                throw new PersistException(String.format("No field is annotated as Id in %s class.", clazz));
-            }
-        } catch (Exception e) {
-            throw new PersistException(e);
-        }
+        AtomicInteger in = new AtomicInteger();
+        Reflect.forEachSqlNamedFields(clazz, f ->
+                        setValueToStatement(Reflect.getFieldValue(clazz, f, object), statement, in.incrementAndGet())
+                , Id.class);
+
+        Field fieldId =  Arrays.stream(clazz.getDeclaredFields()).filter(f -> f.isAnnotationPresent(Column.class) && f.isAnnotationPresent(Id.class))
+                .findFirst().orElseThrow(() -> new PersistException(String.format("No field is annotated as Id in %s class.", clazz)));
+
+        setValueToStatement(Reflect.getFieldValue(clazz, fieldId, object), statement, in.incrementAndGet());
+
+//        try {
+//            int i = 0;
+            //Field fieldId = null;
+//
+//            for (Field field : clazz.getDeclaredFields()) {
+//                if (field.isAnnotationPresent(Column.class)) {
+//                    if (field.isAnnotationPresent(Id.class)){
+//                        fieldId = field;
+//                    }else if(field.isAnnotationPresent(EnumType.class)){
+//                        statement.setObject(++i, Reflect.getGetterMethodByField(clazz, field).invoke(object).toString());
+//                    }else {
+//                        statement.setObject(++i, Reflect.getGetterMethodByField(clazz, field).invoke(object));
+//                    }
+//                } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
+//                    if (field.isAnnotationPresent(JoinColumn.class)) {
+//                        statement.setObject(++i, getId(Reflect.getGetterMethodByField(clazz, field).invoke(object)));
+//                    }else {
+//                        throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne field");
+//                    }
+//                }
+//            }
+//            if (fieldId != null) {
+//                /* Сначала заполняются поля не идентификаторы, идентификатор получает последний номер,
+//                 * так как идентификатор записи передается последним аргументом в запрос
+//                 */
+//                statement.setObject(in.incrementAndGet(), Reflect.getGetterMethodByField(clazz, fieldId).invoke(object));
+//            } else {
+//                throw new PersistException(String.format("No field is annotated as Id in %s class.", clazz));
+//            }
+//        } catch (Exception e) {
+//            throw new PersistException(e);
+//        }
     }
 
     /**
@@ -628,25 +632,30 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>) object.getClass();
 
-        try {
-            int i = 0;
-            Field fieldId = null;
-            for (Field field : clazz.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Column.class) && field.isAnnotationPresent(Id.class)) {
-                    fieldId = field;
-                }
-            }
-            if (fieldId != null) {
-                /* Сначала заполняются поля не идентификаторы, идентификатор получает последний номер,
-                 * так как идентификатор записи передается последним аргументом в запрос
-                 */
-                statement.setObject(++i, Reflect.getGetterMethodByField(clazz, fieldId).invoke(object));
-            } else {
-                throw new PersistException("No field is annotated as Id in Group class.");
-            }
-        } catch (Exception e) {
-            throw new PersistException(e);
-        }
+        Field fieldId =  Arrays.stream(clazz.getDeclaredFields()).filter(f -> f.isAnnotationPresent(Column.class) && f.isAnnotationPresent(Id.class))
+                .findFirst().orElseThrow(() -> new PersistException(String.format("No field is annotated as Id in %s class.", clazz)));
+
+        setValueToStatement(Reflect.getFieldValue(clazz, fieldId, object), statement, 1);
+
+//        try {
+//            int i = 0;
+//            Field fieldId = null;
+//            for (Field field : clazz.getDeclaredFields()) {
+//                if (field.isAnnotationPresent(Column.class) && field.isAnnotationPresent(Id.class)) {
+//                    fieldId = field;
+//                }
+//            }
+//            if (fieldId != null) {
+//                /* Сначала заполняются поля не идентификаторы, идентификатор получает последний номер,
+//                 * так как идентификатор записи передается последним аргументом в запрос
+//                 */
+//                statement.setObject(++i, Reflect.getGetterMethodByField(clazz, fieldId).invoke(object));
+//            } else {
+//                throw new PersistException("No field is annotated as Id in Group class.");
+//            }
+//        } catch (Exception e) {
+//            throw new PersistException(e);
+//        }
 
 
     }
@@ -658,26 +667,31 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>) object.getClass();
 
-        try {
-            int i = 0;
-            for (Field field : clazz.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Column.class) ) {
-                    if (field.isAnnotationPresent(EnumType.class)){
-                        statement.setObject(++i, Reflect.getGetterMethodByField(clazz, field).invoke(object).toString());
-                    }else if (!field.isAnnotationPresent(Id.class)){
-                        statement.setObject(++i, Reflect.getGetterMethodByField(clazz, field).invoke(object));
-                    }
-                } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
-                    if (field.isAnnotationPresent(JoinColumn.class)) {
-                        setPkIdToStatement(Reflect.getGetterMethodByField(clazz, field).invoke(object), statement, ++i);
-                    }else {
-                        throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne field");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new PersistException(e);
-        }
+        AtomicInteger in = new AtomicInteger();
+        Reflect.forEachSqlNamedFields(clazz, f ->
+                        setValueToStatement(Reflect.getFieldValue(clazz, f, object), statement, in.incrementAndGet())
+                , Id.class);
+
+//        try {
+//            int i = 0;
+//            for (Field field : clazz.getDeclaredFields()) {
+//                if (field.isAnnotationPresent(Column.class) ) {
+//                    if (field.isAnnotationPresent(EnumType.class)){
+//                        statement.setObject(++i, Reflect.getGetterMethodByField(clazz, field).invoke(object).toString());
+//                    }else if (!field.isAnnotationPresent(Id.class)){
+//                        statement.setObject(++i, Reflect.getGetterMethodByField(clazz, field).invoke(object));
+//                    }
+//                } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
+//                    if (field.isAnnotationPresent(JoinColumn.class)) {
+//                        setPkIdToStatement(Reflect.getGetterMethodByField(clazz, field).invoke(object), statement, ++i);
+//                    }else {
+//                        throw new PersistException("There were no JoinColumn annotation in annotated with ManyToOne field");
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            throw new PersistException(e);
+//        }
     }
 
     /**
@@ -702,12 +716,8 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                 }
 
                 Object key = rs.getObject(idField.getAnnotation(Column.class).name());
-//                T object = getObjectByKey(clazz, key);
-
                 T object = clazz.getConstructor().newInstance();
-
                 Entry<T, ?> entry = getObjectByKey(clazz, object, key);
-//                Entry<T, ?> entry = getEntryByObjKey(clazz, key).orElseThrow(() -> new PersistException("No Entry!"));
                 object = entry.getObj();
 
                 if (entry.getStatus() == EntryStatus.ISNULL) {
@@ -716,18 +726,17 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
 
                     for (Field field : clazz.getDeclaredFields()) {
                         if (field.isAnnotationPresent(Column.class)) {
+                            Method method = Reflect.getSetterMethodByField(clazz, field);
+                            Object val;
                             if ((field.isAnnotationPresent(EnumType.class))){
-                                Method method = Reflect.getSetterMethodByField(clazz, field);
-                                method.invoke(object, Enum.valueOf((Class<? extends Enum>) field.getType(),
-                                        rs.getObject(field.getAnnotation(Column.class).name()).toString()));
+                                val = Enum.valueOf((Class<? extends Enum>) field.getType(), rs.getObject(field.getAnnotation(Column.class).name()).toString());
                             }else {
-                                Method method = Reflect.getSetterMethodByField(clazz, field);
-                                method.invoke(object,
-                                        rs.getObject(field.getAnnotation(Column.class).name()));
+                                val = rs.getObject(field.getAnnotation(Column.class).name());
                             }
+                            method.invoke(object, val);
                         } else if (field.isAnnotationPresent(ManyToOne.class) || field.isAnnotationPresent(OneToOne.class)) {
                             if (!field.isAnnotationPresent(JoinColumn.class)) {
-                                throw new PersistException(String.format("No @JoinColumn annotation in field (with @ManyToOne annotation): %s ", field.getName()));
+                                throw new PersistException(String.format("No @JoinColumn annotation in field (with @ManyToOne/OneToOne annotation): %s ", field.getName()));
                             }
                             Method method = Reflect.getSetterMethodByField(clazz, field);
 
@@ -743,10 +752,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                             ParameterizedType genericType = (ParameterizedType) field.getGenericType();
                             Class<?> genericFieldClazz = (Class<?>) genericType.getActualTypeArguments()[0];
 
-                            method.invoke(object,
-                                    getListByFK(genericFieldClazz,
-                                            object,
-                                            fieldName, connection));
+                            method.invoke(object, getListByFK(genericFieldClazz, object, fieldName, connection));
 
                         }
                     }
@@ -797,13 +803,12 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>) object.getClass();
 
+        Field field = Arrays.stream(clazz.getDeclaredFields()).filter(f -> f.isAnnotationPresent(Id.class))
+                .findFirst().orElseThrow(() -> new PersistException("No @Id in class: " + clazz.getName()));
+
         try {
-            for (Field field : clazz.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Id.class)) {
-                    Method method = Reflect.getSetterMethodByField(clazz, field);
-                    method.invoke(object, key);
-                }
-            }
+            Method method = Reflect.getSetterMethodByField(clazz, field);
+            method.invoke(object, key);
         } catch (Exception e) {
             throw new PersistException(e);
         }
@@ -813,13 +818,13 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>) object.getClass();
 
+        Field field = Arrays.stream(clazz.getDeclaredFields()).filter(f -> f.isAnnotationPresent(Version.class))
+                .findFirst().orElseThrow(() -> new PersistException("No @Version in class: " + clazz.getName()));
+
         try {
-            for (Field field : clazz.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Version.class)) {
-                    Method method = Reflect.getSetterMethodByField(clazz, field);
-                    method.invoke(object, ver);
-                }
-            }
+            Method method = Reflect.getSetterMethodByField(clazz, field);
+            method.invoke(object, ver);
+
         } catch (Exception e) {
             throw new PersistException(e);
         }
@@ -827,20 +832,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
 
     @SuppressWarnings("unchecked")
     private <T, PK> PK getId(T object) throws PersistException {
-
-        PK value = null;
-
-        for (Field field : object.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class)) {
-                try {
-                    value = (PK) Reflect.getGetterMethodByField(object.getClass(), field).invoke(object);
-                    break;
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new PersistException(e);
-                }
-            }
-        }
-        return value;
+        return Reflect.getId(object);
     }
 
     @SuppressWarnings("unchecked")
@@ -848,16 +840,23 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
 
         int value = 0;
 
-        for (Field field : object.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(Version.class)) {
-                try {
-                    value = (int) Reflect.getGetterMethodByField(object.getClass(), field).invoke(object);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new PersistException(e);
-                }
-            }
-        }
+        Class<T> clazz = (Class<T>)object.getClass();
+
+        Field field = Arrays.stream(clazz.getDeclaredFields()).filter(f -> f.isAnnotationPresent(Version.class))
+                .findFirst().orElseThrow(() -> new PersistException("No @Version in class: " + clazz.getName()));
+        value = (int) Reflect.getFieldValue(clazz, field, object);
+
         return value;
     }
+
+    private void setValueToStatement(Object value, PreparedStatement statement, int i) throws PersistException {
+        try {
+            statement.setObject(i, value);
+        } catch (SQLException e) {
+            throw new PersistException(e);
+        }
+
+    }
+
 
 }

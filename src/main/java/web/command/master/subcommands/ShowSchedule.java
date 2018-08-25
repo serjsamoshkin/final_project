@@ -1,17 +1,14 @@
 package web.command.master.subcommands;
 
-import model.entity.authentication.User;
 import model.service.ServiceMapper;
 import model.service.reception.MasterReceptionService;
-import model.service.reception.ShowReceptionService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import util.dto.reception.ShowMasterSchedule.ShowMasterScheduleInDto;
-import util.dto.reception.ShowMasterSchedule.ShowMasterScheduleOutDto;
+import util.dto.reception.showMasterSchedule.ShowMasterScheduleInDto;
+import util.dto.reception.showMasterSchedule.ShowMasterScheduleOutDto;
 import util.wrappers.WrappedUser;
 import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
-import web.command.admin.AdminCommand;
 import web.command.master.MasterCommand;
 
 import javax.servlet.ServletContext;

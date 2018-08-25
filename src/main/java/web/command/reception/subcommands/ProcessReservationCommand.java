@@ -5,8 +5,8 @@ import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
 import web.command.reception.ReceptionCommand;
 import model.service.ServiceMapper;
-import util.dto.reception.ProcessReservation.ProcessReceptionInDto;
-import util.dto.reception.ProcessReservation.ProcessReceptionOutDto;
+import util.dto.reception.processReservation.ProcessReceptionInDto;
+import util.dto.reception.processReservation.ProcessReceptionOutDto;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

@@ -4,8 +4,8 @@ import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
 import web.command.reception.ReceptionCommand;
 import model.service.ServiceMapper;
-import util.dto.reception.ShowReception.ShowReceptionInDto;
-import util.dto.reception.ShowReception.ShowReceptionOutDto;
+import util.dto.reception.showReception.ShowReceptionInDto;
+import util.dto.reception.showReception.ShowReceptionOutDto;
 import model.service.reception.ShowReceptionService;
 
 import javax.servlet.ServletContext;

@@ -1,4 +1,4 @@
-package util.dto.reception.ShowReception;
+package util.dto.reception.showReception;
 
 import model.entity.reception.Master;
 import model.entity.reception.Service;

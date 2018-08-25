@@ -1,12 +1,10 @@
-package util.dto.reception.ProcessReservation;
+package util.dto.reception.processReservation;
 
 import model.entity.reception.Master;
 import model.entity.reception.Service;
 import util.dto.AbstractDto;
 import util.dto.AbstractDtoBuilder;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Map;
 
 public class ProcessReceptionOutDto extends AbstractDto{

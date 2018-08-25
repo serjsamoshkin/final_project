@@ -18,6 +18,8 @@ public class MySqlCriteriaBuilder<T> extends CriteriaBuilder<T> {
         matchingMap.put(Combinator.OR, "OR");
     }
 
+
+
     /**
      * Root level CriteriaBuilder can get only from JDBCDaoController subtypes.
      */
@@ -60,6 +62,25 @@ public class MySqlCriteriaBuilder<T> extends CriteriaBuilder<T> {
         }
 
         return builder;
+    }
+
+    @Override
+    public String getOrderText() {
+
+        CriteriaBuilder<T>  root = getRoot();
+        if (root == null){
+            root = this;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (!root.getOrderMap().isEmpty()) {
+            stringBuilder.append(" ORDER BY ");
+            root.getOrderMap().forEach((key, value) -> stringBuilder.append(key).append(" ").append(value.name()).append(","));
+            stringBuilder.deleteCharAt(stringBuilder.length()-1);
+        }
+
+        return stringBuilder.toString();
     }
 
     @Override
@@ -108,6 +129,8 @@ public class MySqlCriteriaBuilder<T> extends CriteriaBuilder<T> {
         }
 
         stringBuilder.append(")");
+
+
         return stringBuilder.toString();
     }
 }
