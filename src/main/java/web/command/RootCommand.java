@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.function.Consumer;
 
 @WebCommand(urlPattern = "/jsp",
         parent = Command.class)
@@ -38,13 +40,13 @@ public class RootCommand extends Command<String> {
 
         ServletContext context = request.getServletContext();
         if (context.getAttribute("criticalError") != null && (boolean) context.getAttribute("criticalError")) {
-            forward(Page.PAGE_500, request, response);
+            redirect(Page.PAGE_500, response);
             throw new ServletException("criticalError in servlet");
         }
 
         HttpSession session = request.getSession();
         if (session.getAttribute("sessionCriticalError") != null && (boolean) session.getAttribute("sessionCriticalError")) {
-            forward(Page.PAGE_500, request, response);
+            redirect(Page.PAGE_500, response);
             throw new ServletException("sessionCriticalError");
         }
 
@@ -57,7 +59,7 @@ public class RootCommand extends Command<String> {
         if (command == this) {
             executeCommand(request, response);
         } else if (command == null) {
-            forward(Page.PAGE_404, request, response);
+            redirect(Page.PAGE_404, response);
         } else {
             command.execute(request, response);
         }
@@ -73,7 +75,7 @@ public class RootCommand extends Command<String> {
      */
     @Override
     public void executeCommand(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        forward(Page.PAGE_404, request, response);
+        redirect(Page.PAGE_404, response);
     }
 
     protected Command<String> getCommand(Command<String> command, HttpServletRequest request) {
@@ -111,23 +113,35 @@ public class RootCommand extends Command<String> {
         return comm;
     }
 
-    // TODO лучше будет переделать на сервис, все-равно мы используем тут только сервлет контекст
-    protected void forward(Page page, ServletRequest request, ServletResponse response) throws IOException, ServletException {
-        getServletContext().getRequestDispatcher(page.url).forward(request, response);
+
+    protected void redirect(Page page, HttpServletResponse response) throws IOException, ServletException {
+        redirect(page.url, response);
+    }
+
+    protected void redirect(String url, HttpServletResponse response) throws IOException, ServletException {
+        // without leading slash will have endless loop
+        if (!url.matches("/.*")){
+            url = '/' + url;
+        }
+        response.sendRedirect(url);
     }
 
     protected void forward(String url, ServletRequest request, ServletResponse response) throws IOException, ServletException {
 
-        // TODO можно переделать на генерацию адреса.
-        // Например для каждой команды мы можем выстраивать путь по его @WebCommand(urlPattern, где /jsp это паттерн первого уровня, потом /admin и т.д.
-        // without leading slash we will have endless loop
+        // without leading slash will have endless loop
         if (!url.matches("/.*")){
             url = '/' + url;
         }
-//        if (!url.matches("/jsp.*")){
-//            url = "/jsp" + url;
-//        }
-        getServletContext().getRequestDispatcher(url).forward(request, response);
+
+        request.getRequestDispatcher(url).forward(request, response);
+    }
+
+    protected void computeIfParameterPresent(HttpServletRequest request, String parameter, Consumer<String> action){
+
+        if (request.getParameterMap().containsKey(parameter) && !request.getParameter(parameter).isEmpty()){
+            action.accept(request.getParameter(parameter));
+        }
+
     }
 
     protected enum Page {

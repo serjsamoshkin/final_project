@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,9 +33,8 @@ public class ConfirmLogInCommand extends RootCommand {
     public void executeCommand(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String email = request.getParameter("email");
-
         if (email == null){
-            response.sendRedirect("./");
+            redirect(Page.DEF, response);
             return;
         }
 
@@ -43,15 +43,20 @@ public class ConfirmLogInCommand extends RootCommand {
 
         Optional<User> user = service.getAuthenticatedUser(email, password);
 
+        String refer = request.getParameterMap().getOrDefault("refer", new String[]{""})[0];
         if (user.isPresent()){
             WrappedUser wrappedUser = WrappedUser.of(user.get());
             request.getSession().setAttribute("user", wrappedUser);
-            forward(Page.DEF, request, response);
+            if (refer.isEmpty())
+                redirect(Page.DEF, response);
+            else {
+                redirect(refer, response);
+            }
         }else {
-            // TODO поулчить страничку из хидера
             request.setAttribute("user_not_found", true);
             request.setAttribute("email_r", email);
-            forward("/jsp/login/login.jsp", request, response);
+            request.setAttribute("refer", refer);
+            forward("/login", request, response);
         }
     }
 }

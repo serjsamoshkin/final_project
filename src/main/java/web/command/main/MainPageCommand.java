@@ -19,10 +19,7 @@ public class MainPageCommand extends RootCommand {
 
     @Override
     public void executeCommand(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Переделать на объект, обязательно нужно делать лидирующий слеш, без него будет зацикливание на сервелете
-        String url = "/jsp/main.jsp";
-        // TODO переделать на объект редирект
-        request.getRequestDispatcher(url).forward(request, response);
+        forward("/jsp/main.jsp", request, response);
     }
 
 

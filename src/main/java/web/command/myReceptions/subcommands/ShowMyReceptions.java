@@ -30,11 +30,12 @@ public class ShowMyReceptions extends RootCommand {
 
 
         builder.setUser(WrappedUser.userOf(request.getSession().getAttribute("user")));
+        computeIfParameterPresent(request, "page", builder::setPage);
 
-        String page = request.getParameter("page");
-        if (page != null && !page.equals("")) {
-            builder.setPage(page);
-        }
+//        String page = request.getParameter("page");
+//        if (page != null && !page.equals("")) {
+//            builder.setPage(page);
+//        }
 
         ShowUserReceptionsOutDto dto =  ServiceMapper.getMapper().getService(ShowUserReceptionsService.class).processShowUserReceptionRequest(builder.build());
 
@@ -46,7 +47,7 @@ public class ShowMyReceptions extends RootCommand {
 
             forward("/jsp/myReceptions/my_receptions.jsp", request, response);
         }else {
-            forward(Page.DEF, request, response);
+            redirect(Page.DEF, response);
         }
 
     }

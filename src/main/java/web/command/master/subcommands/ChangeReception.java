@@ -30,25 +30,32 @@ public class ChangeReception extends RootCommand {
 
         ChangeReceptionInDto.ChangeReceptionInDtoBuilder builder = ChangeReceptionInDto.getBuilder();
 
-        if (request.getParameterMap().containsKey("id") && !request.getParameter("id").isEmpty()){
-            builder.setId(request.getParameter("id"));
-        }
+        computeIfParameterPresent(request, "id", builder::setId);
+        computeIfParameterPresent(request, "status", builder::setStatus);
+        computeIfParameterPresent(request, "version", builder::setVersion);
 
-        if (request.getParameterMap().containsKey("status") && !request.getParameter("status").isEmpty()){
-            builder.setStatus(request.getParameter("status"));
-        }
-
-        if (request.getParameterMap().containsKey("version") && !request.getParameter("version").isEmpty()){
-            builder.setVersion(request.getParameter("version"));
-        }
+//        if (request.getParameterMap().containsKey("id") && !request.getParameter("id").isEmpty()){
+//            builder.setId(request.getParameter("id"));
+//        }
+//
+//        if (request.getParameterMap().containsKey("status") && !request.getParameter("status").isEmpty()){
+//            builder.setStatus(request.getParameter("status"));
+//        }
+//
+//        if (request.getParameterMap().containsKey("version") && !request.getParameter("version").isEmpty()){
+//            builder.setVersion(request.getParameter("version"));
+//        }
 
         boolean isOk = ServiceMapper.getMapper().getService(MasterReceptionService.class).changeReception(builder.build());
 
         if (!isOk) {
             logger.error(String.format("Reception doesn't change: id: %s, status: %s", request.getParameter("id"), request.getParameter("status")));
+            redirect(Page.DEF, response);
+        }else {
+            redirect("/master", response);
         }
 
-        forward(Page.DEF, request, response);
+
 
     }
 }

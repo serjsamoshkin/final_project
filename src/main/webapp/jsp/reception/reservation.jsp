@@ -11,7 +11,7 @@
     <%@ include file="../parts/navbar.jsp" %>
 
 
-    <form class="form-horizontal" action="<c:url value="/reception/confirm_reservation"/>" method="get" name="confirm_form">
+    <form class="form-horizontal" action="<c:url value="/reception/confirm_reservation"/>" method="post" name="confirm_form">
         <div class="form-group">
             <label class="col-sm-2 control-label"><fmt:message key="master"/></label>
             <div class="col-sm-4">

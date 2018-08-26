@@ -40,13 +40,10 @@ public class ShowSchedule extends RootCommand {
         ShowMasterScheduleOutDto dto = service.getDailyMasterSchedule(builder.build());
 
         if (dto.isOk()) {
-
             request.setAttribute("master_schedule", dto.getSchedule());
-
             forward("/jsp/master/daily_receptions.jsp", request, response);
-
         } else {
-            forward(Page.DEF, request, response);
+            redirect(Page.DEF, response);
         }
 
 

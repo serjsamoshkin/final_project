@@ -40,9 +40,6 @@ public abstract class Command<T>{
         commandMap.put(key, command);
     }
 
-    //TODO нужен листнер который будет слушать все команды, тогда можно будет создавать цепочку активированных команд.
-    // Сюда хорошо ложится ствой таг, чтобы не извращаться с <?> параметризированными МАПами
-
     /**
      * Method is implementation of pattern Chain of responsibility, Command is routed to another command or invoke executeCommand method.
      * @param request

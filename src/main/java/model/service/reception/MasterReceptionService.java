@@ -7,14 +7,15 @@ import model.entity.authentication.User;
 import model.entity.reception.Master;
 import model.entity.reception.Reception;
 import model.service.AbstractService;
+import model.service.ServiceMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import persistenceSystem.PersistException;
 import util.datetime.LocalDateTimeFormatter;
 import util.datetime.TimePlanning;
+import util.dto.reception.ChangeReceptionInDto;
 import util.dto.reception.ShowMasterScheduleInDto;
 import util.dto.reception.ShowMasterScheduleOutDto;
-import util.dto.reception.ChangeReceptionInDto;
 import util.wrappers.ReceptionView;
 
 import javax.sql.DataSource;
@@ -73,8 +74,6 @@ public class MasterReceptionService extends AbstractService {
 
     public boolean changeReception(ChangeReceptionInDto inDto){
 
-        // TODO пробросить пользователя до ошибки
-
         Reception.Status status;
         if (inDto.getStatus().isPresent()){
             try {
@@ -126,7 +125,7 @@ public class MasterReceptionService extends AbstractService {
 
 
         try (Connection connection = getDataSource().getConnection()) {
-            DaoMapper.getMapper().getDao(ReceptionDAO.class).safeUpdate(reception, status, version, connection);
+            ServiceMapper.getMapper().getService(ReceptionService.class).safeUpdate(reception, status, version, connection);
         } catch (SQLException e) {
             logger.error(e);
         } catch (ConcurrentModificationException e) {

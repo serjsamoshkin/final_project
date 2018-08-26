@@ -10,7 +10,6 @@
     <%@ include file="../parts/navbar.jsp" %>
 
     <div class="col-lg-6 col-md-6 col-xs-9">
-
         <h2><fmt:message key="registration"/>:</h2>
         <form action="<c:url value="/registration/register"/>" method="post" data-toggle="validator" role="form">
             <div class="form-group">
@@ -44,62 +43,6 @@
                     </div>
                 </div>
             </div>
-
-            <script type="text/javascript">
-                var password = document.getElementById("password");
-                var confirmPassword = document.getElementById("confirmPassword");
-                var email = document.getElementById("email");
-
-                password.onchange = validatePassword;
-                confirmPassword.onchange = validateConfirmPassword;
-                email.onchange = validateEmail;
-
-                function validatePassword() {
-                    var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,})");
-                    //console.log(strongRegex.test(password.value));
-                    if (!strongRegex.test(password.value)) {
-                        password.setCustomValidity("<fmt:message key="passwordNotMatch"/>");
-                    }
-                    else {
-                        password.setCustomValidity('');
-
-                    }
-                }
-
-                function validateConfirmPassword() {
-                    if (password.value !== confirmPassword.value) {
-                        confirmPassword.setCustomValidity("<fmt:message key="pleaseEnterTheSamePassword"/>");
-                    } else {
-                        confirmPassword.setCustomValidity('');
-                    }
-                }
-
-                function validateEmail() {
-                    $.ajax({
-                        url: "/registration/check-email",
-                        data: {"email": email.value},
-                        cache: false,
-                        type: "POST",
-                        success: function (responseText) {
-                            checkEmailResult(responseText);
-                        },
-                        error: function (xhr) {
-
-                        }
-                    });
-                }
-
-                function checkEmailResult(responseText) {
-                    if (responseText !== '') {
-                        email.setCustomValidity("<fmt:message key="incorrect_email"/>");
-                        $("#incorrect_email").text("<fmt:message key="incorrect_email"/>");
-                    } else {
-                        email.setCustomValidity('');
-                        $("#incorrect_email").text('');
-                    }
-                }
-            </script>
-
             <div class="form-group">
                 <button type="submit" class="btn btn-primary" id="submit"><fmt:message key="register"/></button>
             </div>
@@ -107,6 +50,60 @@
     </div>
 </div>
 
+<script type="text/javascript">
+    var password = document.getElementById("password");
+    var confirmPassword = document.getElementById("confirmPassword");
+    var email = document.getElementById("email");
+
+    password.onchange = validatePassword;
+    confirmPassword.onchange = validateConfirmPassword;
+    email.onchange = validateEmail;
+
+    function validatePassword() {
+        var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,})");
+        //console.log(strongRegex.test(password.value));
+        if (!strongRegex.test(password.value)) {
+            password.setCustomValidity("<fmt:message key="passwordNotMatch"/>");
+        }
+        else {
+            password.setCustomValidity('');
+
+        }
+    }
+
+    function validateConfirmPassword() {
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity("<fmt:message key="pleaseEnterTheSamePassword"/>");
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+
+    function validateEmail() {
+        $.ajax({
+            url: "/registration/check-email",
+            data: {"email": email.value},
+            cache: false,
+            type: "POST",
+            success: function (responseText) {
+                checkEmailResult(responseText);
+            },
+            error: function (xhr) {
+
+            }
+        });
+    }
+
+    function checkEmailResult(responseText) {
+        if (responseText !== '') {
+            email.setCustomValidity("<fmt:message key="incorrect_email"/>");
+            $("#incorrect_email").text("<fmt:message key="incorrect_email"/>");
+        } else {
+            email.setCustomValidity('');
+            $("#incorrect_email").text('');
+        }
+    }
+</script>
 
 </body>
 </html>

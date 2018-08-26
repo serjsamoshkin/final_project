@@ -4,7 +4,6 @@ import persistenceSystem.JDBCDaoController;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-// TODO подумать о переделке на наследование от абстрактного класса
 public class DaoMapper {
 
     private static DaoMapper mapper;

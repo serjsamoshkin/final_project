@@ -83,8 +83,6 @@ public class ShowReceptionService extends AbstractService {
         List<Master> masters;
 
         try (Connection connection = getDataSource().getConnection()){
-
-
             if (service == Service.EMPTY_SERVICE){
                 masters = DaoMapper.getMapper().getDao(MasterDAO.class).getALL(connection);
                 receptions = DaoMapper.getMapper().getDao(ReceptionDAO.class).getMastersReceptions(date, List.of(), connection);
@@ -118,14 +116,19 @@ public class ShowReceptionService extends AbstractService {
             for (int i = 1; i < TimePlanning.betweenDuration(startTime, endTime); i++) {
                 masterSchedule.computeIfPresent(LocalDateTimeFormatter.toString(TimePlanning.plusDuration(startTime, i)), ShowReceptionService::alwaysTrue);
             }
-                /* Reverse blocking: the user can't reserve this service if the period between the
-                specified time and the current reception time is less than the duration of the service.*/
+            /* Reverse blocking: the user can't reserve this service if the period between the
+             specified time and the current reception time is less than the duration of the service.*/
             for (int i = 1; i < service.getDuration(); i++) {
                 masterSchedule.computeIfPresent(LocalDateTimeFormatter.toString(TimePlanning.minusDuration(startTime, i)), ShowReceptionService::alwaysTrue);
             }
         }
 
         for (Master master : masters) {
+            if (date.isEqual(LocalDate.now())) {
+                for (int i = 0; i < TimePlanning.betweenDuration(TimePlanning.startOfDay(date), LocalTime.now()) +1; i++) {
+                    schedule.get(master).computeIfPresent(LocalDateTimeFormatter.toString(TimePlanning.plusDuration(TimePlanning.startOfDay(date), i)), ShowReceptionService::alwaysTrue);
+                }
+            }
             /* Reverse blocking: from end of day.*/
             for (int i = 1; i < service.getDuration(); i++) {
                 schedule.get(master).computeIfPresent(LocalDateTimeFormatter.toString(TimePlanning.minusDuration(TimePlanning.endOfDay(date), i)), ShowReceptionService::alwaysTrue);

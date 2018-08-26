@@ -26,6 +26,8 @@ public abstract class CriteriaBuilder<T> implements Criteria {
 
     private int[] limit = new int[2];
 
+    private boolean lockRows;
+
 
     /**
      * Root level CriteriaBuilder can only be obtained from JDBCDaoController subtypes.
@@ -76,6 +78,14 @@ public abstract class CriteriaBuilder<T> implements Criteria {
     public abstract String getOrderText();
 
     public abstract String getLimitText();
+
+    public void setLock(){
+        lockRows = true;
+    }
+
+    public boolean isLocked() {
+        return lockRows;
+    }
 
     /**
      * Sets the number of rows for output.

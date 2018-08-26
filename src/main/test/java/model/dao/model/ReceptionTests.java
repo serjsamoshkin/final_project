@@ -2,7 +2,11 @@ package model.dao.model;
 
 import model.dao.DaoMapper;
 import model.dao.reception.ReceptionDAO;
+import model.dao.reception.ReviewDAO;
 import model.entity.reception.Reception;
+import model.entity.reception.Review;
+import model.service.ServiceMapper;
+import model.service.review.ReviewService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +20,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.List;
 
 public class ReceptionTests {
 
@@ -32,17 +37,36 @@ public class ReceptionTests {
 //
 //        MySqlJDBCDaoController daoController = new MySqlJDBCDaoController();
 //
-        ReceptionDAO dao = DaoMapper.getMapper().getDao(ReceptionDAO.class);
+//        ReceptionDAO dao = DaoMapper.getMapper().getDao(ReceptionDAO.class);
+//
+//        Reception rec = dao.getByPK(2, connection);
+//
+//        rec.setStatus(Reception.Status.CANCELED);
+//
+//        dao.update(rec, connection);
+//
+//        System.gc();
 
-        Reception rec = dao.getByPK(2, connection);
+//        dao.getByPK(2, connection);
 
-        rec.setStatus(Reception.Status.CANCELED);
 
-        dao.update(rec, connection);
+//        ServiceMapper.getMapper().getService(ReviewService.class).sendReviews();
 
-        System.gc();
+        ReviewDAO dao = DaoMapper.getMapper().getDao(ReviewDAO.class);
 
-        dao.getByPK(2, connection);
+        try {
+            connection.setAutoCommit(false);
+
+            List<Review> reviews = dao.getUnsentReviews(connection);
+            // TODO просто заглушка
+            reviews.forEach(r -> dao.changeStatus(r, Review.Status.SENT, connection));
+
+            dao.getReviewByToken("cc87d4b7149ebc79df5069326358724c", connection);
+
+            connection.setAutoCommit(true);
+        }catch (SQLException e){
+
+        }
 
 
 

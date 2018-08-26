@@ -50,6 +50,9 @@ public class ReservationService extends AbstractService {
         }else {
             return builder.buildFalse();
         }
+        if (date.isBefore(LocalDate.now())){
+            return builder.buildFalse();
+        }
 
         Optional<LocalTime> timeOpt = dataChecker.checkTime(inDto.getTime());
         LocalTime time;

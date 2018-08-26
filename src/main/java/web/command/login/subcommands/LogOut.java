@@ -33,7 +33,7 @@ public class LogOut extends RootCommand {
 
         session.setAttribute("user", WrappedUser.of());
 
-        forward(Page.DEF, request, response);
+        redirect(Page.DEF, response);
 
     }
 }

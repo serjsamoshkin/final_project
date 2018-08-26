@@ -27,13 +27,15 @@ public class ShowReceptionCommand extends RootCommand {
 
         ShowReceptionInDto.ShowReceptionInDtoBuilder builder = ShowReceptionInDto.getBuilder();
 
-        // TODO можно вынести в проверку и получение параметра в рутовый класс
-        if (request.getParameterMap().containsKey("day") && !request.getParameter("day").isEmpty()){
-            builder.setDay(request.getParameter("day"));
-        }
-        if (request.getParameterMap().containsKey("filter_service_opt") && !request.getParameter("filter_service_opt").isEmpty()){
-            builder.setService(request.getParameter("filter_service_opt"));
-        }
+        computeIfParameterPresent(request, "day", builder::setDay);
+        computeIfParameterPresent(request, "filter_service_opt", builder::setService);
+
+//        if (request.getParameterMap().containsKey("day") && !request.getParameter("day").isEmpty()){
+//            builder.setDay(request.getParameter("day"));
+//        }
+//        if (request.getParameterMap().containsKey("filter_service_opt") && !request.getParameter("filter_service_opt").isEmpty()){
+//            builder.setService(request.getParameter("filter_service_opt"));
+//        }
 
         ShowReceptionOutDto dto = ServiceMapper.getMapper().getService(ShowReceptionService.class).processShowReceptionRequest(builder.build());
 
@@ -41,7 +43,6 @@ public class ShowReceptionCommand extends RootCommand {
             request.setAttribute("masters_schedule", dto.getMastersSchedule());
             request.setAttribute("service_map", dto.getServiceMap());
             request.setAttribute("reservation_day", dto.getReservationDay());
-            //request.setAttribute("reservation_day_txt", dto.getReservationDayTxt());
             request.setAttribute("next_day", dto.getNextDay());
             request.setAttribute("previous_day", dto.getPreviousDay());
             request.setAttribute("hours_duration", dto.getHours());
@@ -49,7 +50,7 @@ public class ShowReceptionCommand extends RootCommand {
 
             forward("/jsp/reception/receptions.jsp", request, response);
         }else {
-            forward(Page.PAGE_500, request, response);
+            redirect(Page.DEF, response);
         }
     }
 }

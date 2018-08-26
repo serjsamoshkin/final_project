@@ -7,7 +7,6 @@ import persistenceSystem.util.Reflect;
 
 import java.lang.Enum;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
@@ -15,7 +14,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MySqlJDBCDaoController extends JDBCDaoController {
@@ -166,7 +164,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             }
         }
 
-        clearEntry(clazz, getId(object));
+        setEntryUpdate(clazz, getId(object));
     }
 
     /**
@@ -220,6 +218,10 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             str.append(criteriaBuilder.getText());
             str.append(criteriaBuilder.getOrderText());
             str.append(criteriaBuilder.getLimitText());
+
+            if (criteriaBuilder.isLocked()){
+                str.append(" FOR UPDATE ");
+            }
 
         }else {
             str = new StringBuilder(criteriaBuilder.getQueryText());

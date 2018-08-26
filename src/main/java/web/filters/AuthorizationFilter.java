@@ -8,8 +8,8 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Arrays;
 
 @WebFilter(urlPatterns = {"/administrator/*", "/master/*", "/reception/*", "/review/*"})
 public class AuthorizationFilter implements Filter {
@@ -43,12 +43,7 @@ public class AuthorizationFilter implements Filter {
                     }
                     break;
                 }
-                case "/review": {
-                    if (wrappedUser.isUser()) {
-                        isAuthorized = true;
-                    }
-                    break;
-                }
+                case "/review":
                 case "/reception": {
                     if (wrappedUser.isUser()) {
                         isAuthorized = true;
@@ -62,15 +57,23 @@ public class AuthorizationFilter implements Filter {
             next.doFilter(request, response);
         }else {
             if (wrappedUser.isAuthenticated()) {
-                httpResponse.sendRedirect("./error404.jsp");
+                httpResponse.sendRedirect("/jsp/error/error404.jsp");
             }else {
-                // TODO кинуть на страничку логироваия, передать изанчальный адрес запроса.
+                request.setAttribute("refer", createReferer(httpRequest));
                 httpRequest.getServletContext().getRequestDispatcher("/login").forward(request, response);
             }
         }
+    }
 
+    private String createReferer(HttpServletRequest request){
 
-
+        StringBuilder str = new StringBuilder(request.getServletPath());
+        str.append(request.getPathInfo() == null ? "" : request.getPathInfo());
+        if (request.getQueryString() != null) {
+            str.append("?");
+            str.append(request.getQueryString());
+        }
+        return str.toString();
     }
 
     @Override

@@ -19,7 +19,7 @@ public class ReceptionCommand extends RootCommand {
 
     @Override
     public void executeCommand(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        forward(Page.PAGE_404, request, response);
+        forward("/reception/show_receptions", request, response);
     }
 
 }

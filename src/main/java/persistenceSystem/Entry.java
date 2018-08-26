@@ -42,9 +42,7 @@ public class Entry<T, PK> {
     }
 
     public synchronized void setStatus(EntryStatus status) {
-        synchronized(clazz) {
-            this.status = status;
-        }
+        this.status = status;
     }
 
     @Override

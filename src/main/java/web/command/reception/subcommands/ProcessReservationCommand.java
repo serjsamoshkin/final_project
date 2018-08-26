@@ -28,24 +28,29 @@ public class ProcessReservationCommand extends RootCommand {
 
         ProcessReceptionInDto.ProcessReceptionInDtoBuilder builder = ProcessReceptionInDto.getBuilder();
 
-        if (request.getParameterMap().containsKey("day") && !request.getParameter("day").isEmpty()){
-            builder.setDay(request.getParameter("day"));
-        }
-        if (request.getParameterMap().containsKey("time") && !request.getParameter("time").isEmpty()){
-            builder.setTime(request.getParameter("time"));
-        }
-        if (request.getParameterMap().containsKey("master") && !request.getParameter("master").isEmpty()){
-            builder.setMaster(request.getParameter("master"));
-        }
-        if (request.getParameterMap().containsKey("filter_service_opt") && !request.getParameter("filter_service_opt").isEmpty()){
-            builder.setService(request.getParameter("filter_service_opt"));
-        }
+        computeIfParameterPresent(request, "day", builder::setDay);
+        computeIfParameterPresent(request, "time", builder::setTime);
+        computeIfParameterPresent(request, "master", builder::setMaster);
+        computeIfParameterPresent(request, "filter_service_opt", builder::setService);
+
+//        if (request.getParameterMap().containsKey("day") && !request.getParameter("day").isEmpty()){
+//            builder.setDay(request.getParameter("day"));
+//        }
+//        if (request.getParameterMap().containsKey("time") && !request.getParameter("time").isEmpty()){
+//            builder.setTime(request.getParameter("time"));
+//        }
+//        if (request.getParameterMap().containsKey("master") && !request.getParameter("master").isEmpty()){
+//            builder.setMaster(request.getParameter("master"));
+//        }
+//        if (request.getParameterMap().containsKey("filter_service_opt") && !request.getParameter("filter_service_opt").isEmpty()){
+//            builder.setService(request.getParameter("filter_service_opt"));
+//        }
 
         ProcessReceptionOutDto dto = ServiceMapper.getMapper().getService(ReservationService.class).processReservationRequest(builder.build());
 
         if (dto.isOk()) {
             if (dto.isReserved()){
-                forward("/reception/reservation_failed.jsp", request, response);
+                forward("/jsp/reception/reservation_failed.jsp", request, response);
             }else {
                 request.setAttribute("service_map", dto.getServiceMap());
                 request.setAttribute("date", dto.getDate());
@@ -58,7 +63,7 @@ public class ProcessReservationCommand extends RootCommand {
                 forward("/jsp/reception/reservation.jsp", request, response);
             }
         }else {
-            forward(Page.DEF, request, response);
+            redirect(Page.DEF, response);
         }
 
     }

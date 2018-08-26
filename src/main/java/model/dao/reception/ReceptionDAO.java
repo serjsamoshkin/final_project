@@ -47,7 +47,7 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
     }
 
     @Override
-    public void update(Reception object, Connection connection) throws PersistException {
+    public void update(Reception object, Connection connection) throws PersistException, ConcurrentModificationException {
         controller.update(object, connection);
     }
 
@@ -64,21 +64,6 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
     @Override
     public void save(Reception object, Connection connection) throws PersistException, RowNotUniqueException {
         controller.save(object, connection);
-    }
-
-    public synchronized void safeUpdate(Reception object, Reception.Status status, int version, Connection connection) throws ConcurrentModificationException {
-        if (object.getId() == 0) {
-            throw new IllegalArgumentException("Reception not persisted");
-        }
-        if (status == null) {
-            throw new NullPointerException("Status is null");
-        }
-
-        Reception copy = Reception.of(object);
-        copy.setStatus(status);
-        copy.setVersion(version);
-
-        update(copy, connection);
     }
 
     public List<Reception> getMastersReceptions(LocalDate date, List<Master> masterList, Connection connection) {
@@ -173,8 +158,8 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
             beauty_saloon.services
                 JOIN beauty_saloon.masters_services ON services.service_id = masters_services.services_service_id
                 JOIN beauty_saloon.masters ON masters_services.masters_master_id = masters.master_id
-                LEFT JOIN beauty_saloon.receptions ON masters.master_id = receptions.masters_master_id AND
-                    receptions.reception_time > '12:00:00' AND receptions.reception_day = '2018-08-19'
+                LEFT JOIN beauty_saloon.receptions ON masters.master_id = receptions.masters_master_id
+                    AND receptions.reception_time > '12:00:00' AND receptions.reception_day = '2018-08-19'
                     AND receptions.reception_status <> 'CANCELED'
         WHERE
             masters.master_id = '1'
@@ -186,19 +171,20 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
         //language=MySQL
         String query =
                 "SELECT t.* \n" +
-                "FROM (\n" +
-                "   SELECT services.*, MIN(DATE_ADD(receptions.reception_time, INTERVAL - services.service_duration * ? MINUTE)) AS min_time\n" +
-                "   FROM\n" +
-                "       services\n" +
-                "        JOIN masters_services ON services.service_id = masters_services.services_service_id\n" +
-                "        JOIN masters ON masters_services.masters_master_id = masters.master_id\n" +
-                "        LEFT JOIN receptions ON masters.master_id = receptions.masters_master_id AND receptions.reception_day > ?" +
-                "           AND receptions.reception_time = ? AND receptions.reception_STATUS <> 'CANCELED'\n" +
-                "   WHERE\n" +
-                "   masters.master_id = ? \n" +
-                "   GROUP BY services.service_id\n" +
-                ") AS t\n" +
-                "WHERE min_time is null OR min_time >= ?";
+                        "FROM (\n" +
+                        "   SELECT services.*, MIN(DATE_ADD(receptions.reception_time, INTERVAL - services.service_duration * ? MINUTE)) AS min_time\n" +
+                        "   FROM\n" +
+                        "       services\n" +
+                        "        JOIN masters_services ON services.service_id = masters_services.services_service_id\n" +
+                        "        JOIN masters ON masters_services.masters_master_id = masters.master_id\n" +
+                        "        LEFT JOIN receptions ON masters.master_id = receptions.masters_master_id " +
+                        "           AND receptions.reception_day = ? \n" +
+                        "           AND receptions.reception_time >= ? AND receptions.reception_STATUS <> 'CANCELED'\n" +
+                        "   WHERE\n" +
+                        "   masters.master_id = ? \n" +
+                        "   GROUP BY services.service_id\n" +
+                        ") AS t\n" +
+                        "WHERE min_time is null OR min_time >= ?";
 
         CriteriaBuilder<Service> criteriaBuilder = controller.getCriteriaBuilder(Service.class);
         criteriaBuilder = criteriaBuilder.rowQuery(query,
@@ -265,6 +251,5 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
         return count;
 
     }
-
 
 }

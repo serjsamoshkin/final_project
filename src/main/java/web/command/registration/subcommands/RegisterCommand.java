@@ -39,11 +39,13 @@ public class RegisterCommand extends RootCommand {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
+        UserService service = ServiceMapper.getMapper().getService(UserService.class);
+
         User user;
         try{
-            user = ServiceMapper.getMapper().getService(UserService.class)
-                    .createUser(name, email, password,
+            service.createUser(name, email, password,
                             ServiceMapper.getMapper().getService(RoleService.class).getRoleUser());
+            user = service.getUserByEmail(email).get();
         }catch (RowNotUniqueException e){
 
             // TODO Перенаправить на ту же страницу
@@ -63,7 +65,7 @@ public class RegisterCommand extends RootCommand {
 
         session.setAttribute("user", WrappedUser.of(user));
 
-        forward(Page.DEF, request, response);
+        redirect(Page.DEF, response);
 
     }
 }

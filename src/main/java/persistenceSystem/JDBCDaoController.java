@@ -19,7 +19,6 @@ public abstract class JDBCDaoController {
      * {@code Map<Entry, WeakReference<Entry>>} (that is value of entryMap). Entry contains WeakReference on
      *  Entity object, thus gc can clear all values in chain of week object -> entry (-> week object) -> week entry -> week entry
      *  when reference on Entity object will be cleared.
-     *
      */
     private static Map<Class, Map<Entry, WeakReference<Entry>>> entryMap;
     private static Map<Object, Entry> controlMap;
@@ -47,7 +46,7 @@ public abstract class JDBCDaoController {
         Entry entry = new Entry<>(obj, key, clazz);
         entryMap.get(clazz).putIfAbsent(entry, new WeakReference<>(entry));
         entry = entryMap.get(clazz).get(entry).get();
-        if (entry.getObj() == null){
+        if (entry.getObj() == null || entry.getStatus() == EntryStatus.UPDATE){
             synchronized (clazz){
                 entry = new Entry<>(obj, key, clazz);
                 entryMap.get(clazz).put(entry, new WeakReference<>(entry));
@@ -63,8 +62,11 @@ public abstract class JDBCDaoController {
         return entry;
     }
 
-    protected final <T, PK> void clearEntry(final Class<T> clazz, PK key){
-        entryMap.get(clazz).remove(Entry.forSearch(key, clazz));
+    protected final <T, PK> void setEntryUpdate(final Class<T> clazz, PK key){
+        entryMap.get(clazz).computeIfPresent(Entry.forSearch(key, clazz), (k, v) -> {
+            v.get().setStatus(EntryStatus.UPDATE);
+            return v;
+        });
     }
 
 

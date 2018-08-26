@@ -26,6 +26,7 @@
                     </p>
                 </div>
             </div>
+            <input type="hidden" name="refer" value=${refer}>
             <button type="submit" class="btn btn-primary"><fmt:message key="login"/></button>
         </form>
     </div>

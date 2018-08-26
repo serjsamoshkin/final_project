@@ -31,7 +31,7 @@ public class InitData extends RootCommand {
 
         initializer.initIfNeed();
 
-        forward(Page.DEF, request, response);
+        redirect(Page.DEF, response);
 
     }
 }
