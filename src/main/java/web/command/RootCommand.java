@@ -141,7 +141,6 @@ public class RootCommand extends Command<String> {
         if (request.getParameterMap().containsKey(parameter) && !request.getParameter(parameter).isEmpty()){
             action.accept(request.getParameter(parameter));
         }
-
     }
 
     protected enum Page {

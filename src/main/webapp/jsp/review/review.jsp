@@ -34,13 +34,13 @@
             <div class="form-group">
                 <label class="col-sm-2 "><fmt:message key="Reception-master"/>:</label>
                 <div class="col-sm-4">
-                    <p class="form-control-static">${reception.master}</p>
+                    <p class="form-control-static"><ex:localizeFieldValue fieldName="name" value="${reception.master}"/></p>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 "><fmt:message key="Reception-service"/>:</label>
                 <div class="col-sm-4">
-                    <p class="form-control-static">${reception.service}</p>
+                    <p class="form-control-static"><ex:localizeFieldValue fieldName="name" value="${reception.service}"/></p>
                 </div>
             </div>
             <div class="form-group">

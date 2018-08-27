@@ -105,16 +105,10 @@ public class ReviewService extends AbstractService {
         ReviewDAO dao = DaoMapper.getMapper().getDao(ReviewDAO.class);
 
         try (Connection connection = getDataSource().getConnection()) {
-            try {
-                connection.setAutoCommit(false);
-                List<Review> reviews = dao.getUnsentReviews(connection);
-                // TODO просто заглушка
-                reviews.forEach(r -> dao.changeStatus(r, Review.Status.SENT, connection));
-            } catch (SQLException e) {
-                connection.rollback();
-                throw e;
-            }
-
+            List<Review> reviews = dao.getUnsentReviews(connection);
+            // TODO просто заглушка
+            reviews.forEach(r -> dao.changeStatus(r, Review.Status.SENT, connection));
+            connection.commit();
         } catch (SQLException e) {
             logger.error(e);
         }

@@ -24,6 +24,8 @@ public class Service implements Comparable<Service>{
     private int id;
     @Column(name = "service_name")
     private String name;
+    @Column(name = "service_name_ru")
+    private String nameRu;
     @Column(name = "service_description")
     private String description;
     @Column(name = "service_duration")
@@ -50,6 +52,14 @@ public class Service implements Comparable<Service>{
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNameRu() {
+        return nameRu;
+    }
+
+    public void setNameRu(String nameRu) {
+        this.nameRu = nameRu;
     }
 
     public String getDescription() {

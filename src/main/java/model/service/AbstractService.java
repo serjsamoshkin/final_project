@@ -1,6 +1,5 @@
 package model.service;
 
-import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 public abstract class AbstractService {

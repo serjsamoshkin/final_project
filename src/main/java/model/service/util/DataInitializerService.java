@@ -42,38 +42,47 @@ public class DataInitializerService extends AbstractService{
 
             Master master1 = new Master();
             master1.setUser(userService.createUser("Иваненко", "ivanenko@me.me", "1", ServiceMapper.getMapper().getService(RoleService.class).getRoleMaster()));
-            master1.setName("Анна");
-            master1.setSurname("Иваненко");
+            master1.setName("Ann");
+            master1.setSurname("Ivanenko");
+            master1.setNameRu("Анна");
+            master1.setSurnameRu("Иваненко");
 
             masterDAO.save(master1, con);
 
             Master master2 = new Master();
             master2.setUser(userService.createUser("Петренко", "petrenko@me.me", "1", ServiceMapper.getMapper().getService(RoleService.class).getRoleMaster()));
-            master2.setName("Инна");
-            master2.setSurname("Петренко");
+            master2.setName("Inna");
+            master2.setSurname("Petrenko");
+            master2.setNameRu("Инна");
+            master2.setSurnameRu("Петренко");
 
             masterDAO.save(master2, con);
 
             Master master3 = new Master();
             master3.setUser(userService.createUser("Сидоренко", "sidorenko@me.me", "1", ServiceMapper.getMapper().getService(RoleService.class).getRoleMaster()));
-            master3.setName("Дарья");
-            master3.setSurname("Сидоренко");
+            master3.setName("Daria");
+            master3.setSurname("Sidorenko");
+            master3.setNameRu("Дарья");
+            master3.setSurnameRu("Сидоренко");
 
             masterDAO.save(master3, con);
 
 
             Service service1 = new Service();
-            service1.setName("Макияж");
+            service1.setName("Makeup");
+            service1.setNameRu("Макияж");
             service1.setDuration(1);
             serviceDAO.save(service1, con);
 
             Service service2 = new Service();
-            service2.setName("Стрижка");
+            service2.setName("Haircut");
+            service2.setNameRu("Стрижка");
             service2.setDuration(2);
             serviceDAO.save(service2, con);
 
             Service service3 = new Service();
-            service3.setName("Маникюр");
+            service3.setName("Manicure");
+            service3.setNameRu("Маникюр");
             service3.setDuration(2);
             serviceDAO.save(service3, con);
 

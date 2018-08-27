@@ -37,6 +37,8 @@ public class ShowReceptionService extends AbstractService {
         super(dataSource);
     }
 
+
+
     public ShowReceptionOutDto processShowReceptionRequest(ShowReceptionInDto inDto){
 
         ShowReceptionOutDto.ShowReceptionOutDtoBuilder builder = ShowReceptionOutDto.getBuilder();
@@ -114,24 +116,30 @@ public class ShowReceptionService extends AbstractService {
             /*Direct blocking: block reservations in between the start and end of the service (for master of the service).*/
             schedule.get(reception.getMaster()).put(LocalDateTimeFormatter.toString(startTime), true);
             for (int i = 1; i < TimePlanning.betweenDuration(startTime, endTime); i++) {
-                masterSchedule.computeIfPresent(LocalDateTimeFormatter.toString(TimePlanning.plusDuration(startTime, i)), ShowReceptionService::alwaysTrue);
+                masterSchedule.computeIfPresent(LocalDateTimeFormatter.toString(TimePlanning.plusDuration(startTime, i)),
+                        ShowReceptionService::alwaysTrue);
             }
             /* Reverse blocking: the user can't reserve this service if the period between the
              specified time and the current reception time is less than the duration of the service.*/
             for (int i = 1; i < service.getDuration(); i++) {
-                masterSchedule.computeIfPresent(LocalDateTimeFormatter.toString(TimePlanning.minusDuration(startTime, i)), ShowReceptionService::alwaysTrue);
+                masterSchedule.computeIfPresent(LocalDateTimeFormatter.toString(TimePlanning.minusDuration(startTime, i)),
+                        ShowReceptionService::alwaysTrue);
             }
         }
 
         for (Master master : masters) {
-            if (date.isEqual(LocalDate.now())) {
-                for (int i = 0; i < TimePlanning.betweenDuration(TimePlanning.startOfDay(date), LocalTime.now()) +1; i++) {
-                    schedule.get(master).computeIfPresent(LocalDateTimeFormatter.toString(TimePlanning.plusDuration(TimePlanning.startOfDay(date), i)), ShowReceptionService::alwaysTrue);
-                }
-            }
+            /*Direct blocking: block reservations from start of day to LocalTime.Now().*/
+//            if (date.isEqual(LocalDate.now())) {
+//                for (int i = 0; i < TimePlanning.betweenDuration(TimePlanning.startOfDay(date), LocalTime.now()) +1; i++) {
+//                    schedule.get(master).computeIfPresent(LocalDateTimeFormatter.toString(
+//                            TimePlanning.plusDuration(TimePlanning.startOfDay(date), i)), ShowReceptionService::alwaysTrue);
+//                }
+//            }
             /* Reverse blocking: from end of day.*/
             for (int i = 1; i < service.getDuration(); i++) {
-                schedule.get(master).computeIfPresent(LocalDateTimeFormatter.toString(TimePlanning.minusDuration(TimePlanning.endOfDay(date), i)), ShowReceptionService::alwaysTrue);
+                schedule.get(master).computeIfPresent(
+                        LocalDateTimeFormatter.toString(TimePlanning.minusDuration(TimePlanning.endOfDay(date), i)),
+                        ShowReceptionService::alwaysTrue);
             }
         }
 
@@ -164,9 +172,7 @@ public class ShowReceptionService extends AbstractService {
     private Map<String, Boolean> getDailyScheme(LocalDate date){
         return TimePlanning.getDailyScheme(date).stream().map(LocalDateTimeFormatter::toString).collect(
                 Collectors.toMap(Function.identity(), ShowReceptionService::alwaysFalse,
-                        (u, v) -> {
-                            throw new IllegalStateException(String.format("Duplicate key %s", u));
-                        },
+                        ShowReceptionService::exception,
                         LinkedHashMap::new));
     }
 
@@ -176,6 +182,10 @@ public class ShowReceptionService extends AbstractService {
 
     private static Boolean alwaysFalse(Object... o) {
         return false;
+    }
+
+    private static Boolean exception(Boolean u, Boolean v) {
+        throw new IllegalStateException(String.format("Duplicate key %s", u));
     }
 
 }

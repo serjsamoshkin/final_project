@@ -27,8 +27,8 @@
                         <td><ex:formatDate shortDate="${reception.day}"/></td>
                         <td><ex:formatTime shortTime="${reception.time}"/></td>
                         <td><ex:formatTime shortTime="${reception.endTime}"/></td>
-                        <td>${reception.master}</td>
-                        <td>${reception.service}</td>
+                        <td><ex:localizeFieldValue fieldName="name" value="${reception.master}"/></td>
+                        <td><ex:localizeFieldValue fieldName="name" value="${reception.service}"/></td>
                         <td><fmt:message key="status-${reception.status}"/></td>
                     </tr>
                 </c:forEach>

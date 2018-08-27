@@ -31,7 +31,7 @@
                         <c:choose>
                             <c:when test="${reception.reserved == true}">
                                 <td>${reception.user}</td>
-                                <td>${reception.service}</td>
+                                <td><ex:localizeFieldValue fieldName="name" value="${reception.service}"/></td>
                                 <td><fmt:message key="status-${reception.status}"/></td>
                             </c:when>
                             <c:otherwise>

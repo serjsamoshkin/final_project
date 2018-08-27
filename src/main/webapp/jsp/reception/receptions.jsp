@@ -58,7 +58,7 @@
                                     selected
                                 </c:if>
                         >
-                                ${service.key.name}
+                                <ex:localizeFieldValue fieldName="name" value="${service.key}"/>
                         </option>
                     </c:forEach>
                 </select>
@@ -80,7 +80,7 @@
         <c:forEach items="${masters_schedule}" var="master">
 
             <div class="col-lg-3 col-md-6 col-xs-12">
-                    ${master.key.name}
+                <ex:localizeFieldValue fieldName="name" value="${master.key}"/>
                 <table class="table table-hover">
                     <tr>
                         <th><fmt:message key="reception-time"/></th>

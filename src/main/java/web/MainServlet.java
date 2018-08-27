@@ -1,6 +1,7 @@
 package web;
 
 
+import model.service.daemon.DaemonStarter;
 import web.command.RootCommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +20,7 @@ import java.io.IOException;
 public class MainServlet extends HttpServlet {
 
     private static final Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
+
 
     @Override
     protected void doPost(

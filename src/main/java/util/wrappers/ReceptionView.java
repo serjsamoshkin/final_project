@@ -1,7 +1,11 @@
 package util.wrappers;
 
+import model.entity.reception.Master;
 import model.entity.reception.Reception;
+import model.entity.reception.Service;
 import util.datetime.LocalDateTimeFormatter;
+
+import java.util.Objects;
 
 public class ReceptionView {
 
@@ -34,7 +38,6 @@ public class ReceptionView {
         return empty;
     }
 
-    // TODO мультиязык
     public String getDay() {
         if (reception == null){
             return "";
@@ -56,15 +59,18 @@ public class ReceptionView {
         return LocalDateTimeFormatter.toString(reception.getEndTime());
     }
 
-    public String getService() {
-        return reception.getService().getName();
+    public Service getService() {
+        if (reception == null){
+            return Service.EMPTY_SERVICE;
+        }
+        return reception.getService();
     }
 
-    public String getMaster() {
+    public Master getMaster() {
         if (reception == null){
-            return "";
+            return Master.EMPTY_MASTER;
         }
-        return reception.getMaster().getName();
+        return reception.getMaster();
     }
 
     public String getUser() {
@@ -101,5 +107,19 @@ public class ReceptionView {
 
     public boolean isReserved() {
         return reserved;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ReceptionView)) return false;
+        ReceptionView that = (ReceptionView) o;
+        return Objects.equals(reception, that.reception);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(reception);
     }
 }

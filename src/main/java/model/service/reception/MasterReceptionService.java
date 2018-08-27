@@ -51,8 +51,7 @@ public class MasterReceptionService extends AbstractService {
 
         List<Reception> receptions;
         try (Connection connection = getDataSource().getConnection()){
-            receptions = DaoMapper.getMapper().getDao(ReceptionDAO.class)
-                    .getMastersReceptions(inDto.getDate().get(), List.of(masterOpt.get()), connection);
+            receptions = getMastersReceptions(inDto.getDate().get(), masterOpt.get(), connection);
         }catch (SQLException e){
             logger.error(e);
             throw new PersistException(e);
@@ -71,6 +70,7 @@ public class MasterReceptionService extends AbstractService {
         return builder.build();
 
     }
+
 
     public boolean changeReception(ChangeReceptionInDto inDto){
 
@@ -136,7 +136,7 @@ public class MasterReceptionService extends AbstractService {
         return true;
     }
 
-    private Optional<Master> getMasterByUser(User user){
+    protected Optional<Master> getMasterByUser(User user){
 
         try (Connection connection = getDataSource().getConnection()){
             return Optional.ofNullable(DaoMapper.getMapper().getDao(MasterDAO.class).getMasterByUserId(user.getId(), connection));
@@ -145,6 +145,11 @@ public class MasterReceptionService extends AbstractService {
             throw new PersistException(e);
         }
 
+    }
+
+    protected List<Reception> getMastersReceptions(LocalDate date, Master master, Connection connection) {
+        return DaoMapper.getMapper().getDao(ReceptionDAO.class)
+                .getMastersReceptions(date, List.of(master), connection);
     }
 
     private static ReceptionView throwIllegalStateException(ReceptionView u, ReceptionView v) {

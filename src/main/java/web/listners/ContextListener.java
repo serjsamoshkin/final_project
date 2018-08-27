@@ -1,5 +1,7 @@
 package web.listners;
 
+import model.service.daemon.DaemonStarter;
+import model.service.daemon.SendReviewDaemon;
 import web.chainCommandSystem.Command;
 import web.chainCommandSystem.CommandBuilder;
 import model.dao.DaoMapper;
@@ -26,6 +28,8 @@ import java.util.ArrayList;
 public class ContextListener implements ServletContextListener{
 
     private static final Logger logger = LogManager.getLogger(ContextListener.class);
+
+    private SendReviewDaemon myThread = null;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent){
@@ -78,10 +82,22 @@ public class ContextListener implements ServletContextListener{
             context.setAttribute("criticalError", true);
             throw new RuntimeException(e);
         }
+
+
+        if ((myThread == null) || (!myThread.isAlive())) {
+            myThread = new SendReviewDaemon();
+            myThread.start();
+        }
+
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
+
+        try {
+            myThread.interrupt();
+        } catch (Exception ex) {
+        }
 
     }
 }

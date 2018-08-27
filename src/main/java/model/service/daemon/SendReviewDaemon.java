@@ -8,9 +8,13 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.TimeUnit;
 
-public class SendReviewDaemon implements Runnable{
+public class SendReviewDaemon extends Thread{
 
     private final Logger logger = LogManager.getLogger(SendReviewDaemon.class);
+
+    public SendReviewDaemon() {
+        setDaemon(true);
+    }
 
     @Override
     public void run() {

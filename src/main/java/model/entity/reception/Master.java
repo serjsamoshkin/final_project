@@ -23,6 +23,10 @@ public class Master implements Comparable<Master>{
     private String name;
     @Column(name = "master_surname")
     private String surname;
+    @Column(name = "master_name_ru")
+    private String nameRu;
+    @Column(name = "master_surname_ru")
+    private String surnameRu;
 
     @OneToOne
     @JoinColumn(name = "users_user_id")
@@ -53,6 +57,22 @@ public class Master implements Comparable<Master>{
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public String getNameRu() {
+        return nameRu;
+    }
+
+    public void setNameRu(String nameRu) {
+        this.nameRu = nameRu;
+    }
+
+    public String getSurnameRu() {
+        return surnameRu;
+    }
+
+    public void setSurnameRu(String surnameRu) {
+        this.surnameRu = surnameRu;
     }
 
     public Set<Service> getMasterServices() {

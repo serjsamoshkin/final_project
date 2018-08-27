@@ -65,7 +65,7 @@ public class ShowUserReceptionsService extends AbstractService {
             int rowsForPage = Integer.valueOf(PaginationPropertiesReader.getInstance()
                     .getPropertyValue("user_reception_count"));
 
-            pageCount = receptionCount / rowsForPage + receptionCount % rowsForPage == 0 ? 1 : 2;
+            pageCount = receptionCount / rowsForPage + receptionCount % rowsForPage == 0 || receptionCount < rowsForPage ? 1 : 2;
             if (page > pageCount) {
                 page = 1;
             }

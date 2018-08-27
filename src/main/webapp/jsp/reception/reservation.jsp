@@ -15,7 +15,7 @@
         <div class="form-group">
             <label class="col-sm-2 control-label"><fmt:message key="master"/></label>
             <div class="col-sm-4">
-                <p class="form-control-static">${master.name}</p>
+                <p class="form-control-static"><ex:localizeFieldValue fieldName="name" value="${master}"/></p>
             </div>
         </div>
         <div class="form-group">
@@ -45,7 +45,7 @@
                                     selected
                                 </c:if>
                         >
-                                ${service.key.name}
+                            <ex:localizeFieldValue fieldName="name" value="${service.key}"/>
                         </option>
                     </c:forEach>
                 </select>
