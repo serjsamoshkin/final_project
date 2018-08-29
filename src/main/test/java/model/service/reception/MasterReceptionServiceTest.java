@@ -1,5 +1,7 @@
 package model.service.reception;
 
+import model.dao.DaoMapper;
+import model.dao.GenericDAO;
 import model.dao.reception.ReceptionDAO;
 import model.entity.authentication.User;
 import model.entity.reception.Master;
@@ -8,6 +10,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import persistenceSystem.JDBCDaoController;
+import persistenceSystem.sql.MySqlJDBCDaoController;
 import util.datetime.LocalDateTimeFormatter;
 import util.datetime.TimePlanning;
 import util.dto.reception.ShowMasterScheduleInDto;
@@ -28,9 +32,8 @@ public class MasterReceptionServiceTest {
 
         final DataSource dataSource = Mockito.mock(DataSource.class);
         final Connection connection = Mockito.mock(Connection.class);
-        final ReceptionDAO dao = Mockito.mock(ReceptionDAO.class);
-
         final MasterReceptionService service = Mockito.spy(new MasterReceptionService(dataSource));
+
 
         final LocalDate now = LocalDate.now();
         final Master master = new Master();
@@ -47,12 +50,10 @@ public class MasterReceptionServiceTest {
         reception.setEndTime(LocalDateTimeFormatter.toSqlTime(TimePlanning.plusDuration(TimePlanning.startOfDay(now), 1)));
         reception.setStatus(Reception.Status.NEW);
 
-        Mockito.when(dataSource.getConnection()).thenReturn(connection);
-
+        Mockito.doReturn(connection).when(dataSource).getConnection();
         Mockito.doReturn(Optional.of(master)).when(service).getMasterByUser(Mockito.any(User.class));
         Mockito.doReturn(List.of(reception)).when(service).getMastersReceptions(Mockito.any(LocalDate.class), Mockito.any(Master.class), Mockito.any(Connection.class));
 
-        Mockito.when(dao.getMastersReceptions(now, List.of(master), connection)).thenReturn(List.of());
 
         ShowMasterScheduleOutDto dto = service.getDailyMasterSchedule(ShowMasterScheduleInDto.getBuilder().setDate(LocalDate.now()).setUser(new User()).build());
 
