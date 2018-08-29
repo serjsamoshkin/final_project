@@ -50,6 +50,7 @@ public class ShowReceptionCommand extends RootCommand {
 
             forward("/jsp/reception/receptions.jsp", request, response);
         }else {
+            logFullError("error in processShowReceptionRequest method", request);
             redirect(Page.DEF, response);
         }
     }

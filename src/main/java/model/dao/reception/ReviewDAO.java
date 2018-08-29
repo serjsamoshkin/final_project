@@ -1,10 +1,7 @@
 package model.dao.reception;
 
 import model.dao.GenericDAO;
-import model.entity.reception.Master;
-import model.entity.reception.MastersService;
-import model.entity.reception.Review;
-import model.entity.reception.Service;
+import model.entity.reception.*;
 import persistenceSystem.JDBCDaoController;
 import persistenceSystem.PersistException;
 import persistenceSystem.RowNotUniqueException;
@@ -15,6 +12,7 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implement DAO of Review model.entity.
@@ -72,9 +70,6 @@ public class ReviewDAO implements GenericDAO<Review, Integer> {
 
     /**
      * For using in lambdas
-     * @param review
-     * @param status
-     * @param connection
      */
     public void changeStatus(Review review, Review.Status status, Connection connection){
         review.setStatus(status);
@@ -103,6 +98,19 @@ public class ReviewDAO implements GenericDAO<Review, Integer> {
         );
 
         return Optional.ofNullable(controller.getByCriteria(Review.class, criteriaBuilder, connection).get(0));
+    }
+
+    public List<Review> getReviewsByReceptions(List<Reception> receptions, Connection connection){
+
+        CriteriaBuilder<Review> criteriaBuilder = controller.getCriteriaBuilder(Review.class);
+        PredicateBuilder<Review> predicateBuilder = criteriaBuilder.getPredicateBuilder(Review.class);
+
+        criteriaBuilder = criteriaBuilder.And(
+                predicateBuilder.in("reception", receptions.stream().map(Reception::getId).collect(Collectors.toList()))
+        );
+
+        return controller.getByCriteria(Review.class, criteriaBuilder, connection);
+
     }
 
 }

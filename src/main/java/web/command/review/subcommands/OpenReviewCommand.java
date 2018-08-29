@@ -36,7 +36,8 @@ public class OpenReviewCommand extends RootCommand {
             request.setAttribute("review_id", dto.getReviewId());
             forward("/jsp/review/review.jsp", request, response);
         }else {
-            // TODO кинуть на страницу "отзыв уже есть".
+            logFullError("error in getReviewByToken method", request);
+            redirect(Page.DEF, response);
         }
 
 

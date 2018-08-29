@@ -28,37 +28,6 @@ public class DataCheckerService extends AbstractService{
         super(dataSource);
     }
 
-    public Optional<Service> getServiceById(int id){
-
-        try (Connection connection = getDataSource().getConnection()){
-            return Optional.ofNullable(DaoMapper.getMapper().getDao(ServiceDAO.class).getByPK(id, connection));
-        }catch (SQLException e){
-            throw new PersistException(e);
-        }
-    }
-
-    public Optional<Master> getMasterById(int id){
-        Optional<Master> master;
-        try (Connection connection = getDataSource().getConnection()){
-            master = Optional.ofNullable(DaoMapper.getMapper().getDao(MasterDAO.class).getByPK(id, connection));
-        }catch (SQLException e){
-            throw new PersistException(e);
-        }
-
-        return master;
-    }
-
-//    public Optional<Master> getMasterByUser(User user){
-//        Optional<Master> master;
-//        try (Connection connection = getDataSource().getConnection()){
-//            master = Optional.ofNullable(DaoMapper.getMapper().getDao(MasterDAO.class).getMasterByUser(user, connection));
-//        }catch (SQLException e){
-//            throw new PersistException(e);
-//        }
-//
-//        return master;
-//    }
-
     public Optional<LocalDate> checkDate(Optional<String> dayOpt, LocalDate def){
 
         if (dayOpt.isPresent()){
@@ -127,5 +96,24 @@ public class DataCheckerService extends AbstractService{
         }
     }
 
+    private Optional<Service> getServiceById(int id){
+
+        try (Connection connection = getDataSource().getConnection()){
+            return Optional.ofNullable(DaoMapper.getMapper().getDao(ServiceDAO.class).getByPK(id, connection));
+        }catch (SQLException e){
+            throw new PersistException(e);
+        }
+    }
+
+    private Optional<Master> getMasterById(int id){
+        Optional<Master> master;
+        try (Connection connection = getDataSource().getConnection()){
+            master = Optional.ofNullable(DaoMapper.getMapper().getDao(MasterDAO.class).getByPK(id, connection));
+        }catch (SQLException e){
+            throw new PersistException(e);
+        }
+
+        return master;
+    }
 
 }

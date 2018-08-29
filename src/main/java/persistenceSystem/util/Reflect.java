@@ -152,6 +152,10 @@ public class Reflect {
 
         PK value = null;
 
+        if (object == null){
+            return null;
+        }
+
         for (Field field : object.getClass().getDeclaredFields()) {
             if (field.isAnnotationPresent(Id.class)) {
                 try {

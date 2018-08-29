@@ -169,8 +169,7 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
      */
 
         //language=MySQL
-        String query =
-                "SELECT t.* \n" +
+        String query = "SELECT t.* \n" +
                         "FROM (\n" +
                         "   SELECT services.*, MIN(DATE_ADD(receptions.reception_time, INTERVAL - services.service_duration * ? MINUTE)) AS min_time\n" +
                         "   FROM\n" +
@@ -229,6 +228,33 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
 
     }
 
+
+    public List<Reception> getReceptionsWithLimit(Connection connection, int page){
+
+        CriteriaBuilder<Reception> criteriaBuilder = controller.getCriteriaBuilder(Reception.class);
+        PredicateBuilder<Reception> predicateBuilder = criteriaBuilder.getPredicateBuilder(Reception.class);
+
+         /*
+        Generates query like:
+        SELECT
+            *
+        FROM
+            beauty_saloon.receptions
+         */
+
+        int rowsForPage = Integer.valueOf(PaginationPropertiesReader.getInstance()
+                .getPropertyValue("admin_reception_count"));
+
+
+        criteriaBuilder.orderBy(Reception.class, "day", CriteriaBuilder.Order.ASC);
+        criteriaBuilder.orderBy(Reception.class, "time", CriteriaBuilder.Order.ASC);
+        criteriaBuilder.limit(rowsForPage*(page-1), rowsForPage*page);
+
+        return controller.getByCriteria(Reception.class, criteriaBuilder, connection);
+
+    }
+
+
     public int getUserReceptionsCount(User user, Connection connection){
 
         //language=MySQL
@@ -240,6 +266,27 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
         int count = 0;
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setObject(1, user.getId());
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()){
+                count = rs.getInt(1);
+            }
+        }catch (SQLException e){
+            throw new PersistException(e);
+        }
+
+        return count;
+
+    }
+
+
+    public int getReceptionsCount(Connection connection){
+
+        //language=MySQL
+        String query = "SELECT count(*)\n" +
+                        "FROM receptions receptions";
+
+        int count = 0;
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             ResultSet rs = statement.executeQuery();
             if (rs.next()){
                 count = rs.getInt(1);

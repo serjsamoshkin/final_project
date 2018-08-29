@@ -10,16 +10,13 @@
     <%@ include file="../parts/navbar.jsp" %>
 
 
-    <table class="table table-striped">
+    <div class="container-fluid">
+        <h3><fmt:message key="review-added"/></h3>
+    </div>
 
-        <tr>
-            <th><fmt:message key="email"/></th>
-            <th><fmt:message key="name"/></th>
-            <th><fmt:message key="roles"/></th>
-        </tr>
-
-    </table>
 
 </div>
+
 </body>
 </html>
+

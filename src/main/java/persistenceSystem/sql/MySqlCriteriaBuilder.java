@@ -11,19 +11,17 @@ import java.util.*;
 
 public class MySqlCriteriaBuilder<T> extends CriteriaBuilder<T> {
 
-    static Map<Combinator, String> matchingMap;
+    private static Map<Combinator, String> matchingMap;
     static {
         matchingMap = new HashMap<>();
         matchingMap.put(Combinator.AND, "AND");
         matchingMap.put(Combinator.OR, "OR");
     }
 
-
-
     /**
      * Root level CriteriaBuilder can get only from JDBCDaoController subtypes.
      */
-    protected MySqlCriteriaBuilder(Class<T> clazz) {
+    MySqlCriteriaBuilder(Class<T> clazz) {
         super(clazz);
     }
 
@@ -120,7 +118,6 @@ public class MySqlCriteriaBuilder<T> extends CriteriaBuilder<T> {
         }
     }
 
-
     public ArrayList<JoinTable<?, ?>> getTableJoins() {
         if (getRoot() == null) {
             return this.getJoins();
@@ -151,6 +148,10 @@ public class MySqlCriteriaBuilder<T> extends CriteriaBuilder<T> {
 
         stringBuilder.append(")");
 
+        // empty predicate builder
+        if (stringBuilder.length() == 2){
+            return "";
+        }
 
         return stringBuilder.toString();
     }

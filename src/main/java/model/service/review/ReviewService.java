@@ -65,6 +65,19 @@ public class ReviewService extends AbstractService {
         return builder.build();
     }
 
+    public Optional<Review> getReviewById(int id) {
+
+        Review review;
+        try (Connection connection = getDataSource().getConnection()) {
+            review = DaoMapper.getMapper().getDao(ReviewDAO.class).getByPK(id, connection);
+        } catch (SQLException e) {
+            logger.error(e);
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(review);
+    }
+
     public boolean setReviewCommentById(int id, String text) {
 
         ReviewDAO dao = DaoMapper.getMapper().getDao(ReviewDAO.class);

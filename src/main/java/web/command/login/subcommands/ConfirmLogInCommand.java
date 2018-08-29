@@ -35,6 +35,7 @@ public class ConfirmLogInCommand extends RootCommand {
         String email = request.getParameter("email");
         if (email == null){
             redirect(Page.DEF, response);
+            logFullError("No parameter email", request);
             return;
         }
 

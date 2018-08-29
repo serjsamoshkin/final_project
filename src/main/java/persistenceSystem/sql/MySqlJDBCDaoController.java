@@ -98,7 +98,6 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
                 throw new PersistException("On insert modify more then 1 record: " + count);
             }
         } catch (SQLException e) {
-            // TODO logger
             throw new PersistException(e);
         }
 
@@ -214,16 +213,20 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
 
             criteriaBuilder.getTableJoins().forEach(c -> str.append(c.getText()));
 
-            str.append(" WHERE ");
-            str.append(criteriaBuilder.getText());
+            String where = criteriaBuilder.getText();
+            if (!where.isEmpty()) {
+                str.append(" WHERE ");
+                str.append(where);
+            }
+
             str.append(criteriaBuilder.getOrderText());
             str.append(criteriaBuilder.getLimitText());
 
-            if (criteriaBuilder.isLocked()){
+            if (criteriaBuilder.isLocked()) {
                 str.append(" FOR UPDATE ");
             }
 
-        }else {
+        } else {
             str = new StringBuilder(criteriaBuilder.getQueryText());
         }
 
@@ -232,9 +235,9 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             List<Object> params = criteriaBuilder.getParameters();
 
             for (int i = 0; i < params.size(); i++) {
-                if (params.get(i) instanceof  Enum){
+                if (params.get(i) instanceof Enum) {
                     statement.setObject(i + 1, params.get(i).toString());
-                }else {
+                } else {
                     statement.setObject(i + 1, params.get(i));
                 }
             }
@@ -242,7 +245,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             ResultSet rs = statement.executeQuery();
             list = parseResultSet(rs, clazz, connection);
 
-         } catch (SQLException e) {
+        } catch (SQLException e) {
             throw new PersistException(e);
         }
 

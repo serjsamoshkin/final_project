@@ -54,8 +54,8 @@ public class ConfirmReservationCommand extends RootCommand {
                 forward("/jsp/reception/reservation_failed.jsp", request, response);
             }else {
 
-                boolean done = ServiceMapper.getMapper().getService(ReservationService.class).confirmReservation(dto,
-                        WrappedUser.userOf(request.getSession().getAttribute("user")));
+                boolean done = ServiceMapper.getMapper().getService(ReservationService.class).
+                        confirmReservation(dto, WrappedUser.userOf(request.getSession().getAttribute("user")));
 
                 if (done) {
                     forward("/jsp/reception/reservation_done.jsp", request, response);
@@ -64,6 +64,7 @@ public class ConfirmReservationCommand extends RootCommand {
                 }
             }
         }else {
+            logFullError("error in processReservationRequest method", request);
             redirect(Page.DEF, response);
         }
 

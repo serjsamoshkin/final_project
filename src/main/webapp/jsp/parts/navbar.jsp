@@ -27,6 +27,11 @@
                         <a class="nav-link" href="<c:url value="/master/"/>"><fmt:message key="master"/></a>
                     </li>
                 </c:if>
+                <c:if test="${user.admin == true}">
+                    <li class="nav-item ${administrator_active}">
+                        <a class="nav-link" href="<c:url value="/administrator/"/>"><fmt:message key="administrator"/></a>
+                    </li>
+                </c:if>
             </ul>
             <ul class="nav navbar-nav navbar-right">
 

@@ -63,6 +63,7 @@ public class ProcessReservationCommand extends RootCommand {
                 forward("/jsp/reception/reservation.jsp", request, response);
             }
         }else {
+            logFullError("error in processReservationRequest method", request);
             redirect(Page.DEF, response);
         }
 

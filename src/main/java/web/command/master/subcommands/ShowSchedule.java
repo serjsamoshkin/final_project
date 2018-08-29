@@ -43,6 +43,7 @@ public class ShowSchedule extends RootCommand {
             request.setAttribute("master_schedule", dto.getSchedule());
             forward("/jsp/master/daily_receptions.jsp", request, response);
         } else {
+            logFullError("error in getDailyMasterSchedule method", request);
             redirect(Page.DEF, response);
         }
 

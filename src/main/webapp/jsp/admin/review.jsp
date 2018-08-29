@@ -45,7 +45,7 @@
             <div class="form-group">
                 <label class="col-sm-2 "><fmt:message key="Comment"/>:</label>
                 <div class="col-sm-8">
-                    <textarea class="form-control" rows="5" id="comment" name="comment"></textarea>
+                    <textarea readonly class="form-control" rows="5" id="comment" name="comment">${review.text}</textarea>
                 </div>
             </div>
 

@@ -17,18 +17,25 @@
                     <th><fmt:message key="reception-day"/></th>
                     <th><fmt:message key="reception-time"/></th>
                     <th><fmt:message key="reception-end-time"/></th>
+                    <th><fmt:message key="reception-client"/></th>
                     <th><fmt:message key="reception-master"/></th>
                     <th><fmt:message key="reception-service"/></th>
                     <th><fmt:message key="reception-status"/></th>
+                    <th><fmt:message key="reception-review"/></th>
                 </tr>
                 <c:forEach items="${reception_list}" var="reception">
                     <tr>
                         <td><ex:formatDate shortDate="${reception.day}"/></td>
                         <td><ex:formatTime shortTime="${reception.time}"/></td>
                         <td><ex:formatTime shortTime="${reception.endTime}"/></td>
+                        <td>${reception.user}"</td>
                         <td><ex:localizeFieldValue fieldName="name" value="${reception.master}"/></td>
                         <td><ex:localizeFieldValue fieldName="name" value="${reception.service}"/></td>
                         <td><fmt:message key="status-${reception.status}"/></td>
+                        <td><c:if test="${reception.hasReview == true}">
+                            <a href="<c:url value="/administrator/show_review?review_id=${reception.review.id}"/>">${reception.review}review</a>
+                        </c:if></td>
+
                     </tr>
                 </c:forEach>
             </table>

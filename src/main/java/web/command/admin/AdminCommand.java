@@ -19,7 +19,7 @@ public class AdminCommand extends RootCommand {
 
     @Override
     public void executeCommand(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        redirect("/jsp/admin/admin.jsp", response);
+        redirect("/administrator/show_receptions", response);
     }
 
 }

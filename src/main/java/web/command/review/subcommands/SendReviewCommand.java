@@ -25,31 +25,30 @@ public class SendReviewCommand extends RootCommand {
         int id;
         String review_id = request.getParameter("review_id");
         if (review_id == null || review_id.isEmpty()){
+            logFullError("no review_id parameter", request);
             redirect(Page.DEF, response);
             return;
         }else {
             try {
                 id = Integer.valueOf(review_id);
             }catch (NumberFormatException e){
-                // TODO залогировать  все что-можно
+                logFullError("Incorrect number in parameter review_id", request);
                 return;
             }
         }
 
         String text = request.getParameter("comment");
         if (text == null){
-            // TODO залогировать  все что-можно
+            logFullError("No text parameter in request", request);
             return;
         }
 
         boolean isOk =  ServiceMapper.getMapper().getService(ReviewService.class).setReviewCommentById(id, text);
 
         if (isOk){
-            // TODO на страничку благодарности
-//            request.setAttribute("reception", dto.getReceptionView());
-//            forward("/jsp/review/review.jsp", request, response);
+            forward("/jsp/review/thank_for_review.jsp", request, response);
         }else {
-            // TODO кинуть на страницу "отзыв уже оставлен".
+            forward("/jsp/review/review_added.jsp", request, response);
         }
 
 

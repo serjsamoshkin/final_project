@@ -31,13 +31,11 @@ public class ShowReceptionService extends AbstractService {
 
     private final Logger logger = LogManager.getLogger(ShowReceptionService.class);
 
-    private DataCheckerService dataChecker = ServiceMapper.getMapper().getService(DataCheckerService.class);
+    DataCheckerService dataChecker = ServiceMapper.getMapper().getService(DataCheckerService.class);
 
-    public ShowReceptionService(DataSource dataSource) {
+    ShowReceptionService(DataSource dataSource) {
         super(dataSource);
     }
-
-
 
     public ShowReceptionOutDto processShowReceptionRequest(ShowReceptionInDto inDto){
 

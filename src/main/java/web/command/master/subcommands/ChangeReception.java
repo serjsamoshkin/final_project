@@ -49,7 +49,7 @@ public class ChangeReception extends RootCommand {
         boolean isOk = ServiceMapper.getMapper().getService(MasterReceptionService.class).changeReception(builder.build());
 
         if (!isOk) {
-            logger.error(String.format("Reception doesn't change: id: %s, status: %s", request.getParameter("id"), request.getParameter("status")));
+            logFullError("error in changeReception method", request);
             redirect(Page.DEF, response);
         }else {
             redirect("/master", response);

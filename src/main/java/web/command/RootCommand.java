@@ -14,14 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.function.Consumer;
 
 @WebCommand(urlPattern = "/jsp",
         parent = Command.class)
 public class RootCommand extends Command<String> {
 
-    protected static final Logger rootLoger = LogManager.getLogger(RootCommand.class);
+    protected static final Logger rootLogger = LogManager.getLogger(RootCommand.class);
 
     public RootCommand(ServletContext servletContext) {
         super(servletContext);
@@ -141,6 +141,31 @@ public class RootCommand extends Command<String> {
         if (request.getParameterMap().containsKey(parameter) && !request.getParameter(parameter).isEmpty()){
             action.accept(request.getParameter(parameter));
         }
+    }
+
+    protected void logFullError(String text, HttpServletRequest request, Exception e){
+
+        rootLogger.error(getErrorLogText(text, request), e);
+    }
+
+    protected void logFullError(String text, HttpServletRequest request){
+
+
+        rootLogger.error(getErrorLogText(text, request));
+    }
+
+    private String getErrorLogText(String text, HttpServletRequest request){
+        StringBuilder error = new StringBuilder();
+        error.append("Error text: ").append(text).append("\n");
+        error.append("HeaderNames: ").append(Collections.list(request.getHeaderNames())).append("\n");
+        error.append("Session: ").append(request.getSession()).append("\n");
+        error.append("Method: ").append(request.getMethod()).append("\n");
+        error.append("ServletPath: ").append(request.getServletPath()).append("\n");
+        error.append("PathInfo: ").append(request.getPathInfo()).append("\n");
+        error.append("QueryString: ").append(request.getQueryString()).append("\n");
+        error.append("ParameterMap: ").append(request.getParameterMap()).append("\n");
+
+        return error.toString();
     }
 
     protected enum Page {
