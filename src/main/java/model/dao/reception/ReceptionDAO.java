@@ -176,8 +176,7 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
                         "       services\n" +
                         "        JOIN masters_services ON services.service_id = masters_services.services_service_id\n" +
                         "        JOIN masters ON masters_services.masters_master_id = masters.master_id\n" +
-                        "        LEFT JOIN receptions ON masters.master_id = receptions.masters_master_id " +
-                        "           AND receptions.reception_day = ? \n" +
+                        "        LEFT JOIN receptions ON receptions.reception_day = ? \n" +
                         "           AND receptions.reception_time >= ? AND receptions.reception_STATUS <> 'CANCELED'\n" +
                         "   WHERE\n" +
                         "   masters.master_id = ? \n" +
@@ -229,12 +228,11 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
     }
 
 
-    public List<Reception> getReceptionsWithLimit(Connection connection, int page){
+    public List<Reception> getReceptionsWithLimitOrderedBy(Connection connection, int page, String sortField, CriteriaBuilder.Order order){
 
         CriteriaBuilder<Reception> criteriaBuilder = controller.getCriteriaBuilder(Reception.class);
-        PredicateBuilder<Reception> predicateBuilder = criteriaBuilder.getPredicateBuilder(Reception.class);
 
-         /*
+       /*
         Generates query like:
         SELECT
             *
@@ -246,8 +244,10 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
                 .getPropertyValue("admin_reception_count"));
 
 
-        criteriaBuilder.orderBy(Reception.class, "day", CriteriaBuilder.Order.ASC);
-        criteriaBuilder.orderBy(Reception.class, "time", CriteriaBuilder.Order.ASC);
+        criteriaBuilder.orderBy(Reception.class, sortField, order);
+        if (!sortField.equals("time")) {
+            criteriaBuilder.orderBy(Reception.class, "time", CriteriaBuilder.Order.ASC);
+        }
         criteriaBuilder.limit(rowsForPage*(page-1), rowsForPage*page);
 
         return controller.getByCriteria(Reception.class, criteriaBuilder, connection);

@@ -11,7 +11,7 @@
 
 
     <div class="container-fluid">
-        <h3><fmt:message key="reservation-sorry"/></h3>
+        <h3><fmt:message key="reservation-another-master"/></h3>
     </div>
 
 

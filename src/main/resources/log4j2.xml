@@ -4,7 +4,7 @@
         <Property name="errorLogPath">${sys:catalina.home}/logs</Property>
         <!--<Property name="infoLogPath">${sys:rootPath}/logs</Property>-->
         <Property name="infoLogPath">${sys:catalina.home}/logs</Property>
-        <Property name="appName">loveReadDownloader</Property>
+        <Property name="appName">beautySalon</Property>
         <Property name="PatternLayout">%d{HH:mm:ss.SSS} [%t] %5p - %msg%n</Property>
     </Properties>
     <Appenders>

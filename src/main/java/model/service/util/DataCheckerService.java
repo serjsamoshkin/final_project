@@ -57,6 +57,22 @@ public class DataCheckerService extends AbstractService{
         }
     }
 
+
+    public Optional<Integer> checkInteger(Optional<String> strOpt){
+
+        if (strOpt.isPresent()){
+            try {
+                return Optional.of(Integer.valueOf(strOpt.get()));
+            }catch (NumberFormatException e){
+                logger.error(e);
+                return Optional.empty();
+            }
+        }else {
+            return Optional.empty();
+        }
+    }
+
+
     public Optional<Master> checkMaster(Optional<String> masterOpt){
 
         if (masterOpt.isPresent()){
@@ -115,5 +131,7 @@ public class DataCheckerService extends AbstractService{
 
         return master;
     }
+
+
 
 }

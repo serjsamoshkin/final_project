@@ -11,7 +11,9 @@
 
     <div class="container-fluid">
 
-        <form class="form-horizontal" action="<c:url value="/review/send_review"/>" method="post">
+        <h2><fmt:message key="Review-user"/>: ${reception.user.name} (${reception.user.email})</h2>
+        <br>
+        <form class="form-horizontal">
             <div class="form-group">
                 <label class="col-sm-2 "><fmt:message key="Reception-day"/>:</label>
                 <div class="col-sm-4">
@@ -48,9 +50,6 @@
                     <textarea readonly class="form-control" rows="5" id="comment" name="comment">${review.text}</textarea>
                 </div>
             </div>
-
-            <input type="hidden" name="review_id" value=${review_id}>
-            <button type="submit" class="btn btn-default"><fmt:message key="submit"/></button>
         </form>
 
     </div>

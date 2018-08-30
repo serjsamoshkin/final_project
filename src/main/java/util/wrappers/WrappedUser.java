@@ -7,6 +7,7 @@ import model.service.ServiceMapper;
 import model.service.authentication.RoleService;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -33,7 +34,6 @@ public class WrappedUser extends User {
         master = roles.contains(roleService.getRoleMaster());
 
         authenticated = userObj != User.NOT_AUTHENTICATED;
-
     }
 
     public static WrappedUser of(){
@@ -59,7 +59,7 @@ public class WrappedUser extends User {
     public static WrappedUser of(Object user){
 
         if (user instanceof WrappedUser){
-            return new WrappedUser(((WrappedUser) user).getUserObj());
+            return (WrappedUser) user;//new WrappedUser(((WrappedUser) user).getUserObj());
         }else if (user instanceof User) {
             return new WrappedUser((User) user);
         }else {
@@ -140,5 +140,25 @@ public class WrappedUser extends User {
 
     public User getUserObj() {
         return userObj;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof WrappedUser)) return false;
+        if (!super.equals(o)) return false;
+        WrappedUser that = (WrappedUser) o;
+        return Objects.equals(getUserObj(), that.getUserObj());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), getUserObj());
+    }
+
+    @Override
+    public String toString() {
+        return getUserObj().toString();
     }
 }

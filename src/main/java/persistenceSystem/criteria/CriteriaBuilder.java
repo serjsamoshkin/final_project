@@ -174,7 +174,7 @@ public abstract class CriteriaBuilder<T> implements Criteria {
 
     public enum Order{
         ASC,
-        DECS;
+        DESC;
     }
 
 }

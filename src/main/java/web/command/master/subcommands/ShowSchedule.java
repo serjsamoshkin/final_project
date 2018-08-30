@@ -4,6 +4,7 @@ import model.service.ServiceMapper;
 import model.service.reception.MasterReceptionService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import util.datetime.LocalDateTimeFormatter;
 import util.dto.reception.ShowMasterScheduleInDto;
 import util.dto.reception.ShowMasterScheduleOutDto;
 import util.wrappers.WrappedUser;
@@ -41,6 +42,7 @@ public class ShowSchedule extends RootCommand {
 
         if (dto.isOk()) {
             request.setAttribute("master_schedule", dto.getSchedule());
+            request.setAttribute("current_day", LocalDateTimeFormatter.toString(LocalDate.now()));
             forward("/jsp/master/daily_receptions.jsp", request, response);
         } else {
             logFullError("error in getDailyMasterSchedule method", request);

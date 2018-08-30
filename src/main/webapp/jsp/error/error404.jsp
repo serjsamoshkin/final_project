@@ -9,8 +9,8 @@
 <body>
 <div class="container">
     <%@ include file="../parts/navbar.jsp" %>
-    <h1><fmt:message key="pageNotExist"/></h1>
-    <h2><fmt:message key="pleaseTryAgain"/></h2>
+    <h1><fmt:message key="error-page-404"/></h1>
+
 </div>
 </body>
 </html>

@@ -15,12 +15,13 @@ public class ProcessReceptionOutDto extends AbstractDto{
     private final String date;
     private final String time;
     private final boolean reserved;
+    private final boolean reservedAnotherMaster;
 
     private final int hours;
     private final int minutes;
     private final String endTime;
 
-    private ProcessReceptionOutDto(boolean ok, Map<Service, Boolean> serviceMap, Master master, Service service, String date, String time, boolean reserved, int hours, int minutes, String endTime) {
+    private ProcessReceptionOutDto(boolean ok, Map<Service, Boolean> serviceMap, Master master, Service service, String date, String time, boolean reserved, boolean reservedAnotherMaster, int hours, int minutes, String endTime) {
         super(ok);
         this.serviceMap = serviceMap;
         this.master = master;
@@ -28,6 +29,7 @@ public class ProcessReceptionOutDto extends AbstractDto{
         this.date = date;
         this.time = time;
         this.reserved = reserved;
+        this.reservedAnotherMaster = reservedAnotherMaster;
         this.hours = hours;
         this.minutes = minutes;
         this.endTime = endTime;
@@ -69,6 +71,10 @@ public class ProcessReceptionOutDto extends AbstractDto{
         return endTime;
     }
 
+    public boolean isReservedAnotherMaster() {
+        return reservedAnotherMaster;
+    }
+
     public static ShowReceptionOutDtoBuilder getBuilder(){
         return new ShowReceptionOutDtoBuilder();
     }
@@ -80,6 +86,7 @@ public class ProcessReceptionOutDto extends AbstractDto{
         private String date;
         private String time;
         private boolean reserved;
+        private boolean reservedAnotherMaster;
 
         private int hours;
         private int minutes;
@@ -115,16 +122,24 @@ public class ProcessReceptionOutDto extends AbstractDto{
             return this;
         }
 
-        public void setHours(int hours) {
+        public ShowReceptionOutDtoBuilder setReservedAnotherMaster(boolean reservedAnotherMaster) {
+            this.reservedAnotherMaster = reservedAnotherMaster;
+            return this;
+        }
+
+        public ShowReceptionOutDtoBuilder setHours(int hours) {
             this.hours = hours;
+            return this;
         }
 
-        public void setMinutes(int minutes) {
+        public ShowReceptionOutDtoBuilder setMinutes(int minutes) {
             this.minutes = minutes;
+            return this;
         }
 
-        public void setEndTime(String endTime) {
+        public ShowReceptionOutDtoBuilder setEndTime(String endTime) {
             this.endTime = endTime;
+            return this;
         }
 
         @Override
@@ -133,7 +148,7 @@ public class ProcessReceptionOutDto extends AbstractDto{
         }
 
         protected ProcessReceptionOutDto build(boolean buildOk){
-            return new ProcessReceptionOutDto(buildOk, serviceMap, master, service, date, time, reserved, hours, minutes, endTime);
+            return new ProcessReceptionOutDto(buildOk, serviceMap, master, service, date, time, reserved,reservedAnotherMaster, hours, minutes, endTime);
         }
     }
 }

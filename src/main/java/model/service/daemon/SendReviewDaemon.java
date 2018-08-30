@@ -18,19 +18,14 @@ public class SendReviewDaemon extends Thread{
 
     @Override
     public void run() {
-
         while (true){
-
             ServiceMapper.getMapper().getService(ReviewService.class).sendReviews();
-
             try {
                 TimeUnit.MINUTES.sleep(5);
             }catch (InterruptedException e){
                 logger.error(e);
                 break;
             }
-
         }
-
     }
 }

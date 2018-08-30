@@ -14,7 +14,7 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
 
-                <li class="nav-item ${init_active}">
+                <li class="nav-item ${home_active}">
                     <a class="nav-link" href="<c:url value="/"/>"><fmt:message key="home"/></a>
                 </li>
                 <c:if test="${user.authenticated == false or user.user == true}">

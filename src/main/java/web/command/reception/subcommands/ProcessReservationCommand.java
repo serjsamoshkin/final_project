@@ -51,6 +51,8 @@ public class ProcessReservationCommand extends RootCommand {
         if (dto.isOk()) {
             if (dto.isReserved()){
                 forward("/jsp/reception/reservation_failed.jsp", request, response);
+            }else if (dto.isReservedAnotherMaster()){
+                forward("/jsp/reception/reservation_another_master.jsp", request, response);
             }else {
                 request.setAttribute("service_map", dto.getServiceMap());
                 request.setAttribute("date", dto.getDate());

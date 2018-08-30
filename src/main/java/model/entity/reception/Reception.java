@@ -39,9 +39,6 @@ public class Reception{
     @JoinColumn(name = "users_user_id")
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "reviews_review_id")
-    private Review review;
 
     @EnumType
     @Column(name = "reception_status")
@@ -101,14 +98,6 @@ public class Reception{
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Review getReview() {
-        return review;
-    }
-
-    public void setReview(Review review) {
-        this.review = review;
     }
 
     public int getVersion() {

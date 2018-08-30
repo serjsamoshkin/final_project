@@ -21,7 +21,7 @@
                 <div class="has-error">
                     <p class="help-block" name="incorrect_email" id="incorrect_email">
                         <c:if test="${user_not_found == true}">
-                            <fmt:message key="userNotFound"/>
+                            <fmt:message key="user-not-found"/>
                         </c:if>
                     </p>
                 </div>

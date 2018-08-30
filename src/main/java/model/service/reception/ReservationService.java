@@ -80,6 +80,9 @@ public class ReservationService extends AbstractService {
 
         Map<Service, Boolean> serviceMap;
         Set<Service> serviceSet = getMasterServiceForDayAndTime(date, time, master);
+        if (serviceSet.isEmpty()){
+            return builder.setReservedAnotherMaster(true).build();
+        }
         if (serviceSet.contains(service) || service == Service.EMPTY_SERVICE) {
             serviceMap = serviceSet.stream().collect(Collectors.toMap(Function.identity(), s -> s.equals(service)));
         } else {

@@ -30,7 +30,7 @@ public class MasterReceptionService extends AbstractService {
 
     private final Logger logger = LogManager.getLogger(MasterReceptionService.class);
 
-    MasterReceptionService(DataSource dataSource) {
+    public MasterReceptionService(DataSource dataSource) {
         super(dataSource);
     }
 

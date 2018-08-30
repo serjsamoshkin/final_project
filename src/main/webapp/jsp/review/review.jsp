@@ -11,6 +11,8 @@
 
     <div class="container-fluid">
 
+        <h2><fmt:message key="Leave-feedback"/>:</h2>
+        <br>
         <form class="form-horizontal" action="<c:url value="/review/send_review"/>" method="post">
             <div class="form-group">
                 <label class="col-sm-2 "><fmt:message key="Reception-day"/>:</label>

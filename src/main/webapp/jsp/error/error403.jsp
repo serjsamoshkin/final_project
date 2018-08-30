@@ -1,4 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+
+<%@ page contentType="text/html;charset=UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="../parts/localized.jsp" %>
 <html>
@@ -8,15 +9,7 @@
 <body>
 <div class="container">
     <%@ include file="../parts/navbar.jsp" %>
-
-
-    <div class="container-fluid">
-        <h3><fmt:message key="reservation-sorry"/></h3>
-    </div>
-
-
+    <h1><fmt:message key="error-page-403"/></h1>
 </div>
-
 </body>
 </html>
-

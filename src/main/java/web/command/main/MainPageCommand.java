@@ -1,5 +1,6 @@
 package web.command.main;
 
+import util.wrappers.WrappedUser;
 import web.chainCommandSystem.annotation.WebCommand;
 import web.command.RootCommand;
 
@@ -9,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebCommand(urlPattern = "/init",
+@WebCommand(urlPattern = "/home",
         parent = RootCommand.class)
 public class MainPageCommand extends RootCommand {
 
@@ -19,6 +20,16 @@ public class MainPageCommand extends RootCommand {
 
     @Override
     public void executeCommand(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        WrappedUser wrappedUser = WrappedUser.of(request.getSession().getAttribute("user"));
+
+        if (wrappedUser.isAdmin()) {
+            forward("/administrator", request, response);
+            return;
+        } else if (wrappedUser.isMaster()) {
+            forward("/master", request, response);
+            return;
+        }
         forward("/jsp/main.jsp", request, response);
     }
 

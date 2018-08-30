@@ -12,7 +12,8 @@
     <div class="container-fluid">
 
         <div class="col-lg-8 ">
-
+            <h2><fmt:message key="Masters-workplace"/>:</h2>
+            <br>
             <table class="table table-hover">
                 <tr>
                     <th><fmt:message key="reception-time"/></th>
@@ -54,11 +55,28 @@
                 </c:forEach>
             </table>
         </div>
+        <div class="col-lg-4 ">
+            <nav aria-label="day">
+                <ul class="pager">
+                    <li> <a href="#"><fmt:message key="current-day"/>: <ex:formatDate shortDate="${current_day}"/></a></li>
+                    <li> <a href="#"><fmt:message key="current-time"/>: <p id="time"></p></a></li>
+                </ul>
+            </nav>
+        </div>
+        </div>
     </div>
+
+
 </div>
 
 <form method="get" name="change_status_form" action="<c:url value="/master/change_reception"/>"></form>
 <script type="text/javascript">
+    var display=setInterval(function(){Time()},0);
+    function Time() {
+        var date=new Date();
+        var time=date.toLocaleTimeString();
+        document.getElementById("time").innerHTML=time;
+    }
 
     function submit_done(id, version) {
         add_id_input(id);

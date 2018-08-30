@@ -5,6 +5,7 @@ import model.entity.reception.Reception;
 import model.entity.reception.Review;
 import model.entity.reception.Service;
 import util.datetime.LocalDateTimeFormatter;
+import util.functionalInterface.MyFunction;
 
 import java.util.Map;
 import java.util.Objects;
@@ -52,52 +53,32 @@ public class ReceptionView {
     }
 
     public String getDay() {
-        if (reception == Reception.EMPTY_RECEPTION){
-            return "";
-        }
-        return LocalDateTimeFormatter.toString(reception.getDay());
+        return getOrDefault(() -> LocalDateTimeFormatter.toString(reception.getDay()), "");
     }
 
     public String getTime() {
-        if (reception == Reception.EMPTY_RECEPTION){
-            return "";
-        }
-        return LocalDateTimeFormatter.toString(reception.getTime());
+        return getOrDefault(() -> LocalDateTimeFormatter.toString(reception.getTime()), "");
     }
 
     public String getEndTime() {
-        if (reception == Reception.EMPTY_RECEPTION){
-            return "";
-        }
-        return LocalDateTimeFormatter.toString(reception.getEndTime());
+        return getOrDefault(() -> LocalDateTimeFormatter.toString(reception.getEndTime()), "");
     }
 
     public Service getService() {
-        if (reception == Reception.EMPTY_RECEPTION){
-            return Service.EMPTY_SERVICE;
-        }
-        return reception.getService();
+        return getOrDefault(reception::getService, Service.EMPTY_SERVICE);
     }
 
     public Master getMaster() {
-        if (reception == Reception.EMPTY_RECEPTION){
-            return Master.EMPTY_MASTER;
-        }
-        return reception.getMaster();
+        return getOrDefault(reception::getMaster, Master.EMPTY_MASTER);
     }
 
-    public String getUser() {
-        if (reception == Reception.EMPTY_RECEPTION){
-            return "";
-        }
-        return reception.getUser().getName();
+    public WrappedUser getUser() {
+        return getOrDefault(() -> WrappedUser.of(reception.getUser()), WrappedUser.of());
     }
+
 
     public String getId(){
-        if (reception == Reception.EMPTY_RECEPTION){
-            return "";
-        }
-        return String.valueOf(reception.getId());
+        return getOrDefault(() -> String.valueOf(reception.getId()), "");
     }
 
     public Review getReview() {
@@ -105,24 +86,23 @@ public class ReceptionView {
     }
 
     public boolean isHasReview() {
-        if (reception == Reception.EMPTY_RECEPTION || review == null){
-            return false;
-        }
-        return review.getStatus().equals(Review.Status.DONE);
+        return getOrDefault(() -> review != null && review.getStatus().equals(Review.Status.DONE), false);
     }
 
     public String getVersion(){
-        if (reception == null){
-            return "";
-        }
-        return String.valueOf(reception.getVersion());
+        return getOrDefault(() -> String.valueOf(reception.getVersion()), "");
     }
 
     public String getStatus(){
-        if (reception == null){
-            return "";
+        return getOrDefault(() -> reception.getStatus().toString(), "");
+    }
+
+    private <R> R getOrDefault(MyFunction<R> function, R def){
+        if (reception == Reception.EMPTY_RECEPTION){
+            return def;
         }
-        return reception.getStatus().toString();
+        R result = function.apply();
+        return result == null ? def : result;
     }
 
     public boolean isProcessed() {

@@ -33,7 +33,7 @@ public class ShowReceptionService extends AbstractService {
 
     DataCheckerService dataChecker = ServiceMapper.getMapper().getService(DataCheckerService.class);
 
-    ShowReceptionService(DataSource dataSource) {
+    public ShowReceptionService(DataSource dataSource) {
         super(dataSource);
     }
 

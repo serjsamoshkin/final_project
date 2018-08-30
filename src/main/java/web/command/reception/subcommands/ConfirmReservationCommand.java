@@ -52,6 +52,8 @@ public class ConfirmReservationCommand extends RootCommand {
         if (dto.isOk()) {
             if (dto.isReserved()){
                 forward("/jsp/reception/reservation_failed.jsp", request, response);
+            }else if(dto.isReservedAnotherMaster()){
+                forward("/jsp/reception/reservation_another_master.jsp", request, response);
             }else {
 
                 boolean done = ServiceMapper.getMapper().getService(ReservationService.class).

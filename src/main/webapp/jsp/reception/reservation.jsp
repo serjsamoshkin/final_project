@@ -33,7 +33,7 @@
         <input type="hidden" name="day" value=${date}>
         <input type="hidden" name="time" value=${time}>
         <div class="form-group">
-            <label for="service" class="col-sm-2 control-label"><fmt:message key="choose_service"/></label>
+            <label for="service" class="col-sm-2 control-label"><fmt:message key="choose-service"/></label>
             <div class="col-sm-4">
                 <select class="form-control .form-inline" id="service" name="filter_service_opt">
                     <option >

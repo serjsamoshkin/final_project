@@ -19,8 +19,6 @@ public class FieldLocalValueTag extends TagSupport {
     private static final Logger logger = LogManager.getLogger(FieldLocalValueTag.class);
     private final static Locale localeRu = new Locale("ru", "RU");
 
-
-
     public void setValue(Object value) {
         this.value = value;
     }

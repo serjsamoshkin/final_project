@@ -121,7 +121,6 @@ public class ReviewService extends AbstractService {
             List<Review> reviews = dao.getUnsentReviews(connection);
             // TODO просто заглушка
             reviews.forEach(r -> dao.changeStatus(r, Review.Status.SENT, connection));
-            connection.commit();
         } catch (SQLException e) {
             logger.error(e);
         }

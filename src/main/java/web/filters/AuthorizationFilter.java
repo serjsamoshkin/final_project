@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 
-@WebFilter(urlPatterns = {"/administrator/*", "/master/*", "/reception/*", "/review/*"})
+@WebFilter(urlPatterns = {"/administrator/*", "/master/*", "/reception/*", "/review/*", "/my_receptions/*"})
 public class AuthorizationFilter implements Filter {
 
     private static final Logger logger = LogManager.getLogger(AuthorizationFilter.class);
@@ -44,6 +44,7 @@ public class AuthorizationFilter implements Filter {
                     break;
                 }
                 case "/review":
+                case "/my_receptions":
                 case "/reception": {
                     if (wrappedUser.isUser()) {
                         isAuthorized = true;
@@ -57,7 +58,7 @@ public class AuthorizationFilter implements Filter {
             next.doFilter(request, response);
         }else {
             if (wrappedUser.isAuthenticated()) {
-                httpResponse.sendRedirect("/jsp/error/error404.jsp");
+                httpResponse.sendRedirect("/jsp/error/error403.jsp");
             }else {
                 request.setAttribute("refer", createReferer(httpRequest));
                 httpRequest.getServletContext().getRequestDispatcher("/login").forward(request, response);

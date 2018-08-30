@@ -9,6 +9,7 @@ import persistenceSystem.criteria.CriteriaBuilder;
 import persistenceSystem.criteria.predicates.PredicateBuilder;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -100,10 +101,15 @@ public class ReviewDAO implements GenericDAO<Review, Integer> {
         return Optional.ofNullable(controller.getByCriteria(Review.class, criteriaBuilder, connection).get(0));
     }
 
-    public List<Review> getReviewsByReceptions(List<Reception> receptions, Connection connection){
+    public List<Review> getReviewsByReceptions(List<Reception> receptions, Connection connection) {
+
+        if (receptions.isEmpty()) {
+            return new ArrayList<>();
+        }
 
         CriteriaBuilder<Review> criteriaBuilder = controller.getCriteriaBuilder(Review.class);
         PredicateBuilder<Review> predicateBuilder = criteriaBuilder.getPredicateBuilder(Review.class);
+
 
         criteriaBuilder = criteriaBuilder.And(
                 predicateBuilder.in("reception", receptions.stream().map(Reception::getId).collect(Collectors.toList()))
