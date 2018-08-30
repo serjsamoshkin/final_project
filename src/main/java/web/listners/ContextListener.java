@@ -47,13 +47,10 @@ public class ContextListener implements ServletContextListener{
             context.setAttribute("isContextInitialized", true);
         }
 
-        // TODO подумать как не хранить в контексте
         Command<String> rootCommand = new CommandBuilder().build(context, "web.command");
 
-        // TODO ничего не хранить в контексте
         context.setAttribute("rootCommand", rootCommand);
 
-        // TODO не красиво
         /*
         Adds all first level commands (WebPatterns) to List. This attribute will be used to maintain current active page.
         More in ActivePage class.

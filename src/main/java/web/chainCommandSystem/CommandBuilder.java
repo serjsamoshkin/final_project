@@ -16,8 +16,6 @@ public class CommandBuilder {
 
     public <T> Command<T> build(ServletContext sc, String packageName) {
 
-        // TODO падать при одинаковых урлах в одном пакете
-
         Command<T> rootCommand = null;
 
         Map<Class<? extends Command<T>>, Class<? extends Command<T>>> result = new HashMap<>();

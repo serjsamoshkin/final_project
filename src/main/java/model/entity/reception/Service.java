@@ -31,7 +31,6 @@ public class Service implements Comparable<Service>{
     @Column(name = "service_duration")
     private int duration;
 
-    // TODO LAZY
     @Column(name = "service_pic")
     SerialBlob picture;
 

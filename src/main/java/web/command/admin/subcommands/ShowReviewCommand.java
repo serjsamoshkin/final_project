@@ -47,7 +47,6 @@ public class ShowReviewCommand extends RootCommand {
                 return;
             }
         }
-        // TODO на ДТО
         Optional<Review> reviewOptional = ServiceMapper.getMapper().getService(ReviewService.class).getReviewById(id);
         if (reviewOptional.isPresent()){
             request.setAttribute("reception", reviewOptional.get().getReception());

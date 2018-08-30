@@ -2,6 +2,7 @@ package web.filters;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import util.logUtil.TextCreator;
 import util.wrappers.WrappedUser;
 
 import javax.servlet.*;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 @WebFilter(urlPatterns = {"/administrator/*", "/master/*", "/reception/*", "/review/*", "/my_receptions/*"})
 public class AuthorizationFilter implements Filter {
@@ -58,7 +60,8 @@ public class AuthorizationFilter implements Filter {
             next.doFilter(request, response);
         }else {
             if (wrappedUser.isAuthenticated()) {
-                httpResponse.sendRedirect("/jsp/error/error403.jsp");
+                logger.error(TextCreator.getErrorLogText("Authorization failed: ", httpRequest));
+                httpResponse.sendRedirect("/error403");
             }else {
                 request.setAttribute("refer", createReferer(httpRequest));
                 httpRequest.getServletContext().getRequestDispatcher("/login").forward(request, response);
@@ -80,4 +83,5 @@ public class AuthorizationFilter implements Filter {
     @Override
     public void destroy() {
     }
+
 }

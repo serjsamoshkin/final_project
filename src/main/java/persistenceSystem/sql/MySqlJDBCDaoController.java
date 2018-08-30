@@ -9,10 +9,7 @@ import java.lang.Enum;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -85,51 +82,73 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             return;
         }
 
-        String sql = getInsertQuery(clazz);
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            prepareStatementForInsert(statement, object);
-            int count;
-            try {
-                count = statement.executeUpdate();
-            }catch (SQLException e){
-                throw new RowNotUniqueException(e, statement);
+        try {
+            boolean outerAutoCommit = connection.getAutoCommit();
+
+            if (!outerAutoCommit){
+                connection.setAutoCommit(false);
             }
-            if (count != 1) {
-                throw new PersistException("On insert modify more then 1 record: " + count);
+            Savepoint spt1 = connection.setSavepoint("svpt1");
+
+            Runnable rollback = () -> {
+                try {
+                    if (outerAutoCommit) {
+                        connection.rollback();
+                    }else {
+                        connection.rollback(spt1);
+                        connection.setAutoCommit(true);
+                    }
+                }catch (SQLException e){
+                    throw new PersistException(e);
+                }
+            };
+
+            String sql = getInsertQuery(clazz);
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                prepareStatementForInsert(statement, object);
+                int count;
+                try {
+                    count = statement.executeUpdate();
+                } catch (SQLException e) {
+                    rollback.run();
+                    throw new RowNotUniqueException(e, statement);
+                }
+                if (count != 1) {
+                    rollback.run();
+                    throw new PersistException("On insert modify more then 1 record: " + count);
+                }
             }
-        } catch (SQLException e) {
-            throw new PersistException(e);
-        }
 
-        String version = getVersionSQLName(clazz);
-        if (!version.isEmpty()){
-            version = ", " + version;
-        }
-
-        StringBuilder str = new StringBuilder(" SELECT ")
-                .append(getSQLIdName(clazz))
-                .append(version)
-                .append(" FROM ")
-                .append(getSQLTableName(clazz))
-                .append(" WHERE ")
-                .append(getSQLIdName(clazz))
-                .append(" = last_insert_id()");
-
-        try (PreparedStatement statement = connection.prepareStatement(str.toString())) {
-
-            ResultSet rs = statement.executeQuery();
-            if (!rs.next()) {
-                // TODO сделать транзакции
-                //pull.rollback();
-                throw new PersistException("Exception on find primary key of new persist data");
+            String version = getVersionSQLName(clazz);
+            if (!version.isEmpty()) {
+                version = ", " + version;
             }
-            setId(object, rs.getObject(1));
-            if (clazz.isAnnotationPresent(VersionControl.class)){
-                setVersion(object, rs.getObject(2));
+
+            StringBuilder str = new StringBuilder(" SELECT ")
+                    .append(getSQLIdName(clazz))
+                    .append(version)
+                    .append(" FROM ")
+                    .append(getSQLTableName(clazz))
+                    .append(" WHERE ")
+                    .append(getSQLIdName(clazz))
+                    .append(" = last_insert_id()");
+
+            try (PreparedStatement statement = connection.prepareStatement(str.toString())) {
+
+                ResultSet rs = statement.executeQuery();
+                if (!rs.next()) {
+                    rollback.run();
+                    throw new PersistException("Exception on find primary key of new persist data");
+                }
+                setId(object, rs.getObject(1));
+                if (clazz.isAnnotationPresent(VersionControl.class)) {
+                    setVersion(object, rs.getObject(2));
+                }
+            } catch (Exception e) {
+                rollback.run();
+                throw new PersistException(e);
             }
         } catch (Exception e) {
-            // TODO сделать транзакции
-            //pull.rollback();
             throw new PersistException(e);
         }
 
@@ -142,7 +161,11 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>) object.getClass();
 
-        synchronized (clazz) {
+        // TODO lock row in MySQl that represent entity
+        // SELECT * FROM [table_name] where id = ? FOR UPDATE
+        // to prevent modification of the version in time of current transaction
+        // need to open transaction here
+        //synchronized (clazz) {
             if (clazz.isAnnotationPresent(VersionControl.class)) {
                 if (checkVersion(clazz, object, connection)) {
                     setVersion(object, getVersion(object) + 1);
@@ -161,7 +184,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             } catch (Exception e) {
                 throw new PersistException(e);
             }
-        }
+        //}
 
         setEntryUpdate(clazz, getId(object));
     }
@@ -267,8 +290,6 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             statement.setObject(1, getId(obj));
             ResultSet rs = statement.executeQuery();
             if (!rs.next()) {
-                // TODO сделать транзакции
-                //pull.rollback();
                 throw new PersistException("Exception on find primary key of new persist data");
             }
             if (rs.getInt(1) != ver){
@@ -276,8 +297,7 @@ public class MySqlJDBCDaoController extends JDBCDaoController {
             }
 
         } catch (Exception e) {
-            // TODO сделать транзакции
-            //pull.rollback();
+
             throw new PersistException(e);
         }
 

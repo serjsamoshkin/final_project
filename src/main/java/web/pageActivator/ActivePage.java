@@ -7,20 +7,21 @@ public class ActivePage {
     private List<String> pageList;
     private HttpSession session;
 
+    @SuppressWarnings("unchecked")
     public ActivePage(HttpSession session) {
         this.pageList = (List<String>) session.getServletContext().getAttribute("pageList");
         this.session = session;
     }
 
-    // TODO перевести
     /**
-     * Содержит MAP с ключами WebPattern первого уровня и признаком какая ветка (ключ) активна.
-     * Признаком активности служит строка _active добавленная к ключу без слеша.
+     * Contains a map with keys WebPatters of the first level commands. The value
+     * of the pair is a mark that this page (and it's sub pages) is active.
+     * The mark of the activity is a string *command_url_pattern* plus '_active' string
+     * (for example administrator_active)
      *
-     * @param pattern
+     * @param pattern - the value of the WebPattern annotation of the activated first level command
      */
     public void setActivePage(String pattern) {
-        // TODO Очередная кривость с добавлением и убвалением слешей и звезд...
         for (String key : pageList) {
             session.setAttribute(
                     key.replace("/*", "")

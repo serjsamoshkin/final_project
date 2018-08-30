@@ -87,8 +87,8 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
 
     }
 
-    public boolean checkReservationInSchedule(LocalDate date, LocalTime startTime, LocalTime endTime,
-                                              Master master, Optional<Integer> recId, Connection connection){
+    public boolean checkReservationInScheduleWithLock(LocalDate date, LocalTime startTime, LocalTime endTime,
+                                                      Master master, Optional<Integer> recId, Connection connection){
 
         CriteriaBuilder<Reception> criteriaBuilder = controller.getCriteriaBuilder(Reception.class);
         PredicateBuilder<Reception> predicateBuilder = criteriaBuilder.getPredicateBuilder(Reception.class);
@@ -121,6 +121,8 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
                         predicateBuilder.equal("time", sqlStartTime)
                 )
         );
+
+        criteriaBuilder.setLock();
 
         List<Reception> list = controller.getByCriteria(Reception.class, criteriaBuilder, connection);
 

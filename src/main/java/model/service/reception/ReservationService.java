@@ -97,7 +97,7 @@ public class ReservationService extends AbstractService {
             try (Connection connection = getDataSource().getConnection()){
                 builder.setReserved(
                         DaoMapper.getMapper().getDao(ReceptionDAO.class).
-                                checkReservationInSchedule(date, time, endTime, master, Optional.empty(), connection));
+                                checkReservationInScheduleWithLock(date, time, endTime, master, Optional.empty(), connection));
             }catch (SQLException e){
                 logger.error(e);
                 throw new PersistException(e);
@@ -141,21 +141,19 @@ public class ReservationService extends AbstractService {
         try (Connection connection = getDataSource().getConnection()){
             connection.setAutoCommit(false);
             DaoMapper.getMapper().getDao(ReceptionDAO.class).save(reception, connection);
-            // TODO надежнее было бы заблочить записи в БД
-            synchronized (ReceptionDAO.class) {
-                boolean reserved = DaoMapper.getMapper().getDao(ReceptionDAO.class).checkReservationInSchedule(
-                        LocalDateTimeFormatter.toLocalDate(receptionDto.getDate()),
-                        LocalDateTimeFormatter.toLocalTime(receptionDto.getTime()),
-                        localEndTime,
-                        receptionDto.getMaster(),
-                        Optional.of(reception.getId()),
-                        connection);
-                if (reserved) {
-                    connection.rollback();
-                    return false;
-                }else {
-                    connection.commit();
-                }
+
+            boolean reserved = DaoMapper.getMapper().getDao(ReceptionDAO.class).checkReservationInScheduleWithLock(
+                    LocalDateTimeFormatter.toLocalDate(receptionDto.getDate()),
+                    LocalDateTimeFormatter.toLocalTime(receptionDto.getTime()),
+                    localEndTime,
+                    receptionDto.getMaster(),
+                    Optional.of(reception.getId()),
+                    connection);
+            if (reserved) {
+                connection.rollback();
+                return false;
+            } else {
+                connection.commit();
             }
 
             connection.setAutoCommit(true);

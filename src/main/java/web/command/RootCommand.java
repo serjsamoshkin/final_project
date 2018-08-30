@@ -1,5 +1,6 @@
 package web.command;
 
+import util.logUtil.TextCreator;
 import web.chainCommandSystem.Command;
 import web.chainCommandSystem.annotation.WebCommand;
 import org.apache.logging.log4j.LogManager;
@@ -79,7 +80,7 @@ public class RootCommand extends Command<String> {
         redirect(Page.PAGE_404, response);
     }
 
-    protected Command<String> getCommand(Command<String> command, HttpServletRequest request) {
+    private Command<String> getCommand(Command<String> command, HttpServletRequest request) {
 
         Command<String> comm;
 
@@ -119,7 +120,7 @@ public class RootCommand extends Command<String> {
         redirect(page.url, response);
     }
 
-    protected void redirect(String url, HttpServletResponse response) throws IOException, ServletException {
+    protected void redirect(String url, HttpServletResponse response) throws IOException {
         // without leading slash will have endless loop
         if (!url.matches("/.*")){
             url = '/' + url;
@@ -146,31 +147,15 @@ public class RootCommand extends Command<String> {
 
     protected void logFullError(String text, HttpServletRequest request, Exception e){
 
-        rootLogger.error(getErrorLogText(text, request), e);
+        rootLogger.error(TextCreator.getErrorLogText(text, request), e);
     }
 
     protected void logFullError(String text, HttpServletRequest request){
 
 
-        rootLogger.error(getErrorLogText(text, request));
+        rootLogger.error(TextCreator.getErrorLogText(text, request));
     }
 
-    private String getErrorLogText(String text, HttpServletRequest request){
-        StringBuilder error = new StringBuilder();
-        error.append("Error text: ").append(text).append(" ").append("\n");
-        error.append("HeaderNames: ").append(" ").append("\n");
-        Collections.list(request.getHeaderNames()).forEach(h -> error.append(h).append(": ").append(request.getHeader(h)).append(" "));
-        error.append("Session: ").append(request.getSession()).append(" ").append("\n");
-        error.append("Method: ").append(request.getMethod()).append(" ").append("\n");
-        error.append("ServletPath: ").append(request.getServletPath()).append(" ").append("\n");
-        error.append("PathInfo: ").append(request.getPathInfo()).append(" ").append("\n");
-        error.append("QueryString: ").append(request.getQueryString()).append(" ").append("\n");
-        error.append("ParameterMap: ").append(" ").append("\n");
-        request.getParameterMap().forEach((k, v) -> error.append(k).append(": ").append(Arrays.toString(v)));
-        error.append(" ").append("\n");
-
-        return error.toString();
-    }
 
     protected enum Page {
         DEF("/"),

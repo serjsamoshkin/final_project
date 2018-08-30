@@ -32,7 +32,6 @@ public class User {
     @Column(name = "user_password_hash")
     private String passwordHash;
 
-    //TODO При создании нового пользователя список пуст, нужно переделать запись таблиц вторичных ключей через внутренний сеттер.
     @OneToMany(mappedBy = "user")
     private List<UsersRole> usersRoles = new ArrayList<>();
 

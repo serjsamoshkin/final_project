@@ -119,7 +119,7 @@ public class ReviewService extends AbstractService {
 
         try (Connection connection = getDataSource().getConnection()) {
             List<Review> reviews = dao.getUnsentReviews(connection);
-            // TODO просто заглушка
+            // просто заглушка
             reviews.forEach(r -> dao.changeStatus(r, Review.Status.SENT, connection));
         } catch (SQLException e) {
             logger.error(e);

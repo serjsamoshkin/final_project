@@ -20,7 +20,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
-// TODO пронаследоваться от абстрактного класса ContextService - у него должен быть контекст, и гет/сет
 public class UserService extends AbstractService{
 
     private static final Logger logger = LogManager.getLogger(UserService.class);

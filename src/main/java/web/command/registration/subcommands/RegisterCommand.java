@@ -48,12 +48,6 @@ public class RegisterCommand extends RootCommand {
             user = service.getUserByEmail(email).get();
         }catch (RowNotUniqueException e){
 
-            // TODO Перенаправить на ту же страницу
-            /* response.sendRedirect(req.getHeader("referer")) - дает весь путь, (включая название приложения от локалхост)
-            Если будет механизм определения относительного пути команды, то можно будет брать только имя jsp страницы и
-            редиректить на нее.
-             */
-
             request.setAttribute("user_name_r", name);
             request.setAttribute("user_email_r", email);
             request.setAttribute("incorrect_email", true);

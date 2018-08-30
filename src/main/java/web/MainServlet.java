@@ -16,7 +16,8 @@ import java.io.IOException;
 
 @WebServlet(name = "MainServlet",
         urlPatterns = {"/home", "/registration/*", "/reception/*", "/login/*",
-                "/set_locale", "/administrator/*", "/master/*", "/my_receptions/*", "/review/*"})
+                "/set_locale", "/administrator/*", "/master/*", "/my_receptions/*", "/review/*",
+                "/error403", "/error404", "/error500"})
 public class MainServlet extends HttpServlet {
 
     private static final Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);

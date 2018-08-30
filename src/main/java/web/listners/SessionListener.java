@@ -18,15 +18,6 @@ import javax.servlet.http.HttpSessionListener;
 
 @WebListener
 public class SessionListener implements HttpSessionListener{
-    // TODO убрать
-    /*
-    Chrome помнит сессию и не дает новую после F5, при этом срабатывает ServletRequestListener.
-    Первое обращение после деплойда не ловится, это странно.
-    Создается новое соединение при входе с другого браузера или режима инкогнито, дальше все обращения
-    к сервлету идут с этого идентификатора сессии.
-    Обновление страницы (а так же открытие в новой вкладеке) инициирует ServletRequestListener, но пока не ясно какой
-    именно целевой листнер при этом срабатывает.
-     */
 
     private static final Logger logger = LogManager.getLogger(SessionListener.class);
 

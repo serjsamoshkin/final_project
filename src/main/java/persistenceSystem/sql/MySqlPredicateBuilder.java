@@ -97,7 +97,6 @@ public class MySqlPredicateBuilder<T> extends PredicateBuilder<T> {
     }
 
 
-    // TODO переписать генерацию подчиненного объекта через один метод, в который передавать только тип
     @Override
     public PredicateBuilder equal(String fieldName, Object value) throws PersistException {
         return new MySqlPredicateBuilder<>(
