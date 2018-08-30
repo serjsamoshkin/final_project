@@ -11,7 +11,15 @@
 
     <div class="container-fluid">
 
-        <div class="col-lg-8 ">
+        <div class="col-xs-12 col-sm-4 col-sm-push-8">
+            <nav aria-label="day">
+                <ul class="pager">
+                    <li><a href="#"><fmt:message key="current-day"/>: <p><ex:formatDate shortDate="${current_day}"/></p></a></li>
+                    <li><a href="#"><fmt:message key="current-time"/>: <p id="time"></p></a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="col-xs-12 col-sm-8 col-sm-pull-4">
             <h2><fmt:message key="Masters-workplace"/>:</h2>
             <br>
             <table class="table table-hover">
@@ -35,47 +43,46 @@
                                 <td><fmt:message key="status-${reception.status}"/></td>
                             </c:when>
                             <c:otherwise>
-                                <td></td><td></td><td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
                             </c:otherwise>
                         </c:choose>
                         <c:choose>
                             <c:when test="${reception.reserved == true and reception.processed == false}">
                                 <td>
-                                    <a href="javascript: submit_done('${reception.id}', '${reception.version}')"><fmt:message key="done"/></a>
+                                    <a href="javascript: submit_done('${reception.id}', '${reception.version}')"><fmt:message
+                                            key="done"/></a>
                                 </td>
                                 <td>
-                                    <a href="javascript: submit_canceled('${reception.id}', '${reception.version}')"><fmt:message key="canceled"/></a>
+                                    <a href="javascript: submit_canceled('${reception.id}', '${reception.version}')"><fmt:message
+                                            key="canceled"/></a>
                                 </td>
                             </c:when>
                             <c:otherwise>
-                                <td></td><td></td>
+                                <td></td>
+                                <td></td>
                             </c:otherwise>
                         </c:choose>
                     </tr>
                 </c:forEach>
             </table>
         </div>
-        <div class="col-lg-4 ">
-            <nav aria-label="day">
-                <ul class="pager">
-                    <li> <a href="#"><fmt:message key="current-day"/>: <ex:formatDate shortDate="${current_day}"/></a></li>
-                    <li> <a href="#"><fmt:message key="current-time"/>: <p id="time"></p></a></li>
-                </ul>
-            </nav>
-        </div>
-        </div>
     </div>
-
+</div>
 
 </div>
 
 <form method="get" name="change_status_form" action="<c:url value="/master/change_reception"/>"></form>
 <script type="text/javascript">
-    var display=setInterval(function(){Time()},0);
+    var display = setInterval(function () {
+        Time()
+    }, 0);
+
     function Time() {
-        var date=new Date();
-        var time=date.toLocaleTimeString();
-        document.getElementById("time").innerHTML=time;
+        var date = new Date();
+        var time = date.toLocaleTimeString();
+        document.getElementById("time").innerHTML = time;
     }
 
     function submit_done(id, version) {

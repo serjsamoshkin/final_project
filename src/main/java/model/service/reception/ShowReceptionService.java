@@ -49,6 +49,11 @@ public class ShowReceptionService extends AbstractService {
             return builder.buildFalse();
         }
 
+        if (date.isBefore(LocalDate.now())){
+            logger.error("the value of the date parameter is less than the current day");
+            return builder.buildFalse();
+        }
+
         Optional<Service> serviceOpt = dataChecker.checkService(inDto.getService(), Service.EMPTY_SERVICE);
         Service service;
         if (serviceOpt.isPresent()){

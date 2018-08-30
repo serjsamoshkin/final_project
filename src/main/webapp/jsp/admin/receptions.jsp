@@ -17,7 +17,7 @@
             <table id="myTable" class="table table-hover tablesorter">
                 <tr>
                     <th id = "reception_day" onclick="sortTable('reception_day')"><fmt:message key="reception-day"/> ${signMap.reception_day}</th>
-                    <th id = "reception_time" onclick="sortTable('reception_time')"><fmt:message key="reception-time"/>${signMap.reception_time}</th>
+                    <th id = "reception_time" onclick="sortTable('reception_time')"><fmt:message key="reception-time"/> ${signMap.reception_time}</th>
                     <th><fmt:message key="reception-end-time"/></th>
                     <th><fmt:message key="reception-client"/></th>
                     <th><fmt:message key="reception-user-email"/></th>
