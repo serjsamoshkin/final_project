@@ -61,7 +61,7 @@ public class AuthorizationFilter implements Filter {
         }else {
             if (wrappedUser.isAuthenticated()) {
                 logger.error(TextCreator.getErrorLogText("Authorization failed: ", httpRequest));
-                httpResponse.sendRedirect("/error403");
+                httpResponse.sendRedirect(httpRequest.getServletContext().getContextPath() + "/error403");
             }else {
                 request.setAttribute("refer", createReferer(httpRequest));
                 httpRequest.getServletContext().getRequestDispatcher("/login").forward(request, response);

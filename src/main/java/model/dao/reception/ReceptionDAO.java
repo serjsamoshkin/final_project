@@ -179,7 +179,7 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
                         "        JOIN masters_services ON services.service_id = masters_services.services_service_id\n" +
                         "        JOIN masters ON masters_services.masters_master_id = masters.master_id\n" +
                         "        LEFT JOIN receptions ON receptions.reception_day = ? \n" +
-                        "           AND receptions.reception_time >= ? AND receptions.reception_STATUS <> 'CANCELED'\n" +
+                        "           AND receptions.reception_time >= ? AND receptions.reception_status <> 'CANCELED'\n" +
                         "   WHERE\n" +
                         "   masters.master_id = ? \n" +
                         "   GROUP BY services.service_id\n" +
@@ -223,7 +223,7 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
 
         criteriaBuilder.orderBy(Reception.class, "day", CriteriaBuilder.Order.ASC);
         criteriaBuilder.orderBy(Reception.class, "time", CriteriaBuilder.Order.ASC);
-        criteriaBuilder.limit(rowsForPage*(page-1), rowsForPage*page);
+        criteriaBuilder.limit(rowsForPage*(page-1), rowsForPage);
 
         return controller.getByCriteria(Reception.class, criteriaBuilder, connection);
 
@@ -250,7 +250,7 @@ public class ReceptionDAO implements GenericDAO<Reception, Integer> {
         if (!sortField.equals("time")) {
             criteriaBuilder.orderBy(Reception.class, "time", CriteriaBuilder.Order.ASC);
         }
-        criteriaBuilder.limit(rowsForPage*(page-1), rowsForPage*page);
+        criteriaBuilder.limit(rowsForPage*(page-1), rowsForPage);
 
         return controller.getByCriteria(Reception.class, criteriaBuilder, connection);
 

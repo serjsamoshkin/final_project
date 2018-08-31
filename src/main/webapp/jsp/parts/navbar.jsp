@@ -9,7 +9,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/"><fmt:message key="web-site-name"/></a>
+            <a class="navbar-brand" href="<c:url value="/"/>"><fmt:message key="web-site-name"/></a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
@@ -53,7 +53,7 @@
                 <c:choose>
                     <c:when test="${user.authenticated == false}">
                         <li class="nav-item ${login_active}">
-                            <a class="nav-link" href="/login">
+                            <a class="nav-link" href="<c:url value="/login/"/>">
                                 </span><fmt:message key="login"/>
                                 <span class="glyphicon glyphicon-log-in"></span>
                             </a>

@@ -30,12 +30,7 @@ public class RootCommand extends Command<String> {
     }
 
     /**
-     *
      * {@inheritDoc}
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
      */
     @Override
     public final void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -69,11 +64,6 @@ public class RootCommand extends Command<String> {
 
     /**
      * Method must be overridden in each subclass, otherwise it will be redirected to a 404 page.
-     *
-     * @param request -
-     * @param response -
-     * @throws ServletException -
-     * @throws IOException -
      */
     @Override
     public void executeCommand(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -116,7 +106,7 @@ public class RootCommand extends Command<String> {
     }
 
 
-    protected void redirect(Page page, HttpServletResponse response) throws IOException, ServletException {
+    protected void redirect(Page page, HttpServletResponse response) throws IOException {
         redirect(page.url, response);
     }
 
@@ -125,7 +115,7 @@ public class RootCommand extends Command<String> {
         if (!url.matches("/.*")){
             url = '/' + url;
         }
-        response.sendRedirect(url);
+        response.sendRedirect(getServletContext().getContextPath() + url);
     }
 
     protected void forward(String url, ServletRequest request, ServletResponse response) throws IOException, ServletException {
